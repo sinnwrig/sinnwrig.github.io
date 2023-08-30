@@ -118,8 +118,6 @@ mousePos.y /= window.innerHeight;
 document.onmousemove = handleMouseMove;
 function handleMouseMove(event) {
     var eventDoc, doc, body;
-
-    event = event || window.event;
 			
     if (event.pageX == null && event.clientX != null) {
         eventDoc = (event.target && event.target.ownerDocument) || document;
