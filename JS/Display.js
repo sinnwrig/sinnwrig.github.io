@@ -99,10 +99,7 @@ window.onresize = () =>
 
 const start = Date.now() / 1000;
 
-var mousePos = new THREE.Vector2(window.event.clientX, window.event.clientY);
-mousePos.x /= window.innerWidth;
-mousePos.y /= window.innerHeight;
-
+var mousePos = new THREE.Vector2(0, 0);
 
 document.onmousemove = handleMouseMove;
 function handleMouseMove(event) {
