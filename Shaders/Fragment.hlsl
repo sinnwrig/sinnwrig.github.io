@@ -64,7 +64,7 @@ void main(void)
 {
     vec2 u = gl_FragCoord.xy;
 			
-	u = (u - resolution.xy * .5) / resolution.y;
+	u = (u - resolution.xy * 0.5) / resolution.y;
 	vec2 u2 = u;   
       
     vec4 color = vec4(0.0);
