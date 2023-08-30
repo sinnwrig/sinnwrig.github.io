@@ -2,7 +2,7 @@ import * as THREE from 'https://cdn.skypack.dev/THREE@0.129.0';
 
 var shader;
 
-$.get('/Shaders/Feagment.hlsl', {}, function(content) { shader = content });
+$.get('/Shaders/Fragment.hlsl', {}, function(content) { shader = content });
             
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
