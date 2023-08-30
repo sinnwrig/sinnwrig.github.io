@@ -2,7 +2,9 @@ import * as THREE from 'https://cdn.skypack.dev/THREE@0.129.0';
 
 var shader;
 
-$.get('/Shaders/Fragment.hlsl', {}, function(content) { shader = content });
+fetch('https://sinnwrig.github.io/JS/Display.js').then(response => response.text()).then((data) => {
+    shader = data
+});
             
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
