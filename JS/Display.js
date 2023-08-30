@@ -1,8 +1,12 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 
 const shader = `
+vec2 pos;
 uniform float time;
 uniform vec2 resolution;
+
+#define LINE_W 0.1
+#define AA 15.0 / resolution.y
 
 
 //3D gradient noise by Íñigo Quílez
@@ -48,9 +52,6 @@ vec2 rotate2D(vec2 _st, float _angle)
     return _st;
 }
 
-#define LINE_W 0.1
-#define AA 15.0 / resolution.y
-
 float cell(vec2 uv)
 {
 	return smoothstep(LINE_W + AA, LINE_W, dist2Line(vec2(-0.3, 0), vec2(0.3, 0), uv));
@@ -59,20 +60,26 @@ float cell(vec2 uv)
 
 void main(void) 
 {
-    vec2 u = gl_FragCoord.xy;
+    gl_FragColor = 1.0;
+    return;
 
-    u = (u - resolution.xy * .5) / resolution.y;
-    vec2 u2 = u;   
+    vec2 uv = gl_FragCoord.xy;
+    vec3 color = 0.0;
+
+    u = (uv - resolution.xy * .5) / resolution.y;
+    vec2 u2 = uv;   
        
-    u *= 2.0;
-    float f = noise(vec3(u * 2.0, time));
-    gl_FragColor = vec4(cell(rotate2D(fract(u * 16.) - 0.5, f * 6.2831)));
+    uv *= 2.0;
+    float f = noise(vec3(uv * 2.0, time));
+    color = vec4(cell(rotate2D(fract(uv * 16.) - 0.5, f * 6.2831)));
         
     // 24 by 12 border.
     if (abs(u2.x * 16.0) > 12.0 || abs(u2.y * 16.0) > 6.0) 
     {
-        gl_FragColor *= 0.0;
+        color = 0.0;
     }
+
+    gl_FragColor = color;
 }`;
             
 const renderer = new THREE.WebGLRenderer();
