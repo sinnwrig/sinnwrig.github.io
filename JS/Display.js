@@ -59,9 +59,20 @@ float cell(vec2 uv)
 
 void main(void) 
 {
-    vec2 pos = 2.0*gl_FragCoord.xy / resolution.y - vec2(resolution.x/resolution.y, 1.0);
-    float d = sqrt(pos.x*pos.x + pos.y*pos.y)*10.0;
-    gl_FragColor = vec4(1.0+cos(time*0.97+d), 1.0+cos(time*0.59+d), 1.0+cos(-0.83*time+d), 2.0)/2.0;
+    vec2 u = gl_FragCoord.xy;
+
+    u = (u - resolution.xy * .5) / resolution.y;
+    vec2 u2 = u;   
+       
+    u *= 2.0;
+    float f = noise(vec3(u * 2.0, time));
+    gl_FragColor = vec4(cell(rotate2D(fract(u * 16.) - 0.5, f * 6.2831)));
+        
+    // 24 by 12 border.
+    if (abs(u2.x * 16.0) > 12.0 || abs(u2.y * 16.0) > 6.0) 
+    {
+        gl_FragColor *= 0.0;
+    }
 }`;
             
 const renderer = new THREE.WebGLRenderer();
@@ -100,6 +111,9 @@ window.onresize = () =>
 const start = Date.now() / 1000;
 
 var mousePos = new THREE.Vector2(0, 0);
+mousePos.x /= window.innerWidth;
+mousePos.y /= window.innerHeight;
+
 
 document.onmousemove = handleMouseMove;
 function handleMouseMove(event) {
