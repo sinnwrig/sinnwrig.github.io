@@ -103,7 +103,7 @@ planeMesh.scale.set(window.innerWidth / window.innerHeight, 1, 1);
 scene.add(planeMesh);
     
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 1000);
-camera.position.set(0, 0, 0);
+camera.position.set(0, 0, 1);
 scene.add(camera);
     
 window.onresize = () => 
