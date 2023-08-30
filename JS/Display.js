@@ -87,15 +87,15 @@ renderer.setSize(window.innerWidth, window.innerHeight, window.devicePixelRatio)
 
 document.body.appendChild(renderer.domElement);
 
-const shaderUniforms = 
-{
-	time: {value: 1},
-    resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
-};
-    
 const scene = new THREE.Scene();
 const planeGeometry = new THREE.PlaneGeometry();
-const planeMaterial = new THREE.ShaderMaterial({ uniforms: shaderUniforms, fragmentShader: shader });
+const planeMaterial = new THREE.ShaderMaterial({ 
+    uniforms: {
+        time: {value: 1},
+        resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) }
+    }, 
+    fragmentShader: shader 
+});
 
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 			
