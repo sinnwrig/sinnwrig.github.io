@@ -2,9 +2,8 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 
 var shader;
 
-$.get('/docs/file.txt', {}, function(content)
-{
-    shader = content;
+fetch('https://sinnwrig.github.io/JS/Display.js').then(response => response.text()).then((data) => {
+    shader = data
 });
             
 const renderer = new THREE.WebGLRenderer();
