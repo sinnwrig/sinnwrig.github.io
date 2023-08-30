@@ -1,4 +1,4 @@
-import * as THREE from 'https://cdn.skypack.dev/THREE@0.129.0';
+import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 
 var shader;
 
