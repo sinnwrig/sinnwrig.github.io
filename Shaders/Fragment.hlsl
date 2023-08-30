@@ -1,5 +1,13 @@
 uniform float time;
 uniform vec2 resolution;
+      
+#define LINE_W 0.1
+#define AA 15.0 / resolution.y
+      
+#define GRID_SCALE 24.0
+#define GRID_X 12.0
+#define GRID_Y 6.0
+
 
 
 //3D gradient noise by Íñigo Quílez
@@ -17,7 +25,7 @@ float noise(in vec3 p)
 {
     vec3 i = floor(p);
     vec3 f = fract(p);
-	
+
 	vec3 u = f * f * (3.0 - 2.0 * f);
 
     return mix( mix(mix(dot(hash(i + vec3(0.0, 0.0, 0.0)), f - vec3(0.0, 0.0, 0.0)), 
@@ -45,29 +53,30 @@ vec2 rotate2D(vec2 _st, float _angle)
     return _st;
 }
 
-#define LINE_W 0.1
-#define AA 15.0 / resolution.y
 
 float cell(vec2 uv)
 {
 	return smoothstep(LINE_W + AA, LINE_W, dist2Line(vec2(-0.3, 0), vec2(0.3, 0), uv));
 }
-    
+
 
 void main(void) 
 {
     vec2 u = gl_FragCoord.xy;
-
-    u = (u - resolution.xy * .5) / resolution.y;
-    vec2 u2 = u;   
-       
-    u *= 2.0;
-    float f = noise(vec3(u * 2.0, time));
-    gl_FragColor = vec4(cell(rotate2D(fract(u * 16.) - 0.5, f * 6.2831)));
-        
-    // 24 by 12 border.
-    if (abs(u2.x * 16.0) > 12.0 || abs(u2.y * 16.0) > 6.0) 
-    {
-        gl_FragColor *= 0.0;
-    }
+			
+	u = (u - resolution.xy * .5) / resolution.y;
+	vec2 u2 = u;   
+      
+    vec4 color = vec4(0.0);
+      
+	float f = noise(vec3(u * 2.0, time));
+	color = vec4(cell(rotate2D(fract(u * 16.0) - 0.5, f * 6.2831)));
+			
+	// 24 by 12 border.
+	if (abs(u2.x * GRID_SCALE) > GRID_X || abs(u2.y * GRID_SCALE) > GRID_Y)
+	{
+	    color = vec4(0.0);
+	}
+      
+    gl_FragColor = color;
 }

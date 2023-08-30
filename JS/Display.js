@@ -1,11 +1,4 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
-
-const shader = `
-void main(void) 
-{
-    gl_FragColor = 1.0;
-    return;
-}`;
             
 const renderer = new THREE.WebGLRenderer();
     
