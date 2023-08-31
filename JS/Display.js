@@ -41,8 +41,9 @@ const bufferTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.inner
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 1000);
 camera.position.set(0, 0, 1);
 scene.add(camera);
-
-const fullscreenMeshes = [];
+bufferScene.add(camera);
+ 
+const fullscreenMeshes = []; 
 
 window.onresize = () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -91,15 +92,6 @@ function RenderFrame()
 
     let time = SceneTime();
 
-    scene.traverse(function(object) 
-    {
-        if (object.material) 
-        {
-            object.material.uniforms.time.value = time;
-            object.material.uniforms.flowTexture.value = bufferTarget.texture;
-        }
-    });
-
     var mouseDirection = mousePos.sub(lastMouse).normalize();
 
     bufferScene.traverse(function(object)
@@ -112,8 +104,19 @@ function RenderFrame()
         }
     });
 
-    renderer.render(bufferScene, camera, bufferTarget);
-
+    renderer.setRenderTarget(bufferTarget);
+    renderer.render(bufferScene, camera);
+    
+    scene.traverse(function(object) 
+    {
+        if (object.material) 
+        {
+            object.material.uniforms.time.value = time;
+            object.material.uniforms.flowTexture.value = bufferTarget.texture;
+        }
+    });
+    
+    renderer.setRenderTarget(null);
     renderer.render(scene, camera);
 }
   
@@ -186,8 +189,8 @@ async function LoadShader(url)
 LoadShader('https://sinnwrig.github.io/Shaders/Fragment.hlsl').then((shader) => {
     AddFullscreenPlane(shader);
 });
-
+ 
 
 LoadShader('https://sinnwrig.github.io/Shaders/FlowTexture.hlsl').then((shader) => {
-    AddBufferPlane(shader);
+    AddBufferPlane(shader); 
 });
