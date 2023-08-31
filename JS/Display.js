@@ -35,7 +35,7 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const bufferScene = new THREE.Scene();
-const bufferTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
+const bufferTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
 
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 1000);
@@ -51,7 +51,7 @@ window.onresize = () => {
 
     let fullscreenScale = window.innerWidth / window.innerHeight;
     let resolution = new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
-    bufferTexture.setSize(window.innerWidth, window.innerHeight);
+    bufferTarget.setSize(window.innerWidth, window.innerHeight);
 
     for (let i = 0; i < fullscreenMeshes.length; i++) 
     {
@@ -96,7 +96,7 @@ function RenderFrame()
         if (object.material) 
         {
             object.material.uniforms.time.value = time;
-            object.material.uniforms.flowTexture.value = bufferTexture;
+            object.material.uniforms.flowTexture.value = bufferTarget.texture;
         }
     });
 
@@ -112,7 +112,7 @@ function RenderFrame()
         }
     });
 
-    renderer.render(bufferScene, camera, bufferTexture);
+    renderer.render(bufferScene, camera, bufferTarget);
 
     renderer.render(scene, camera);
 }
@@ -130,7 +130,7 @@ function AddFullscreenPlane(shader)
         uniforms: {
             time: { value: time },
             resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
-            flowTexture: { value: bufferTexture }
+            flowTexture: { value: bufferTarget }
         },
         fragmentShader: shader
     } );
