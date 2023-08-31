@@ -111,20 +111,22 @@ function AddFullscreenPlane(shader)
         
     scene.add(planeMesh);
     fullscreenMeshes.add(planeMesh);
+
+    return planeMesh;
 }
 
 
-function LoadFullscreenShader(url)
+async function LoadFullscreenShader(url)
 {
-    fetch(url)
-    .then(response => response.text())
-    .then((shader) => 
-    {
-        const segments = new URL(url).pathname.split('/');
-        const last = segments.pop() || segments.pop();
-        console.log('Loaded shader ' + last);
-        AddFullscreenPlane(shader);
-    });
+    const response = await fetch(url);
+    const text = await response.text();
+
+    const segments = new URL(url).pathname.split('/');
+    const last = segments.pop() || segments.pop();
+    console.log('Loaded shader ' + last);
+    AddFullscreenPlane(shader);
+
+    return AddFullscreenPlane(shader);
 }
 
 // Fetch fragment shader
