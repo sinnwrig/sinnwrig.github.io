@@ -10,7 +10,7 @@
 	<body style="margin: 0;">  
         <p hidden="true", id="shader-1">
 uniform float time;
-uniform vec2 resolution;
+uniform vec3 resolution;
 uniform sampler2D flowTexture;
 
       
@@ -18,8 +18,8 @@ uniform sampler2D flowTexture;
 #define AA 15.0 / resolution.y
       
 #define GRID_SCALE 24.0
-#define GRID_X 12.0
-#define GRID_Y 6.0
+#define GRID_X 24.0
+#define GRID_Y 12.0
 
 
 
@@ -80,44 +80,36 @@ void main(void)
 	uv = (uv - resolution.xy * 0.5) / resolution.y;
 	vec2 u2 = uv;   
       
-    vec4 color = vec4(0.0);
+  vec4 color = vec4(0.0);
+  
+  float dir = texture(flowTexture, gl_FragCoord.xy / resolution.xy).x;
       
-	float f = noise(vec3(uv * 2.0, time));
+	float f = noise(vec3(uv * 2.0, time)); 
 	color = vec4(cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831)));
-			
-	// 24 by 12 border.
-	if (abs(u2.x * GRID_SCALE) > GRID_X || abs(u2.y * GRID_SCALE) > GRID_Y)
-	{
-	    color = vec4(0.0);
-	}
-	
-	color = texture(flowTexture, uv);
-
+          
   gl_FragColor = color;
 }
         </p>
         <p hidden="true" id="shader-2">
-uniform float time;
-uniform vec2 resolution;
+uniform float deltaTime;
+uniform vec3 resolution;
+uniform sampler2D flowTexture;
           
 uniform vec2 mousePosition;
 uniform vec2 dragDirection;
 
+#define FADE_POWER 0.1
 
 void main(void) 
 {
-    vec2 uv = gl_FragCoord.xy / resolution.xy;
-     
-    float distToMouse = distance(uv, mousePosition);
-    
-    vec4 color = vec4(0.0, 1.0, 1.0, 0.0);
+    vec2 uv = gl_FragCoord.xy;
           
-    if (distToMouse < 0.25) 
-    { 
-        color = vec4(1.0, 0.0, 0.0, 0.0);                   
-    }
+    vec2 prevValues = texture(flowTexture, uv / resolution.xy);
     
-    gl_FragColor = vec4(uv.x, uv.y, 0.0, 0.0);
+    float direction = 0.0;
+    float influence = distance(uv, mousePosition * resolution.xy);
+    
+    gl_FragColor = vec4(direction, influence, 0.0, 0.0);
 }
         </p>
         <script type="module" src="JS/Display.js"></script>

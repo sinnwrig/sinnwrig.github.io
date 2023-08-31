@@ -1,58 +1,58 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 
 var mousePos = new THREE.Vector2();
+var lastMouse = new THREE.Vector2();
+var mouseDirection = new THREE.Vector2();
+var resolution = new THREE.Vector3(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight);
 
 function onDocumentMouseMove(event)
-{
-    mousePos.x = (event.offsetX / window.innerWidth);
-    mousePos.y = 1 - (event.offsetY / window.innerHeight);
+{   
+    mousePos.x = (event.offsetX / resolution.x);
+    mousePos.y = 1 - (event.offsetY / resolution.y);
 }
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
-renderer.setPixelRatio(window.devicePixelRatio);
 renderer.domElement.addEventListener('mousemove', onDocumentMouseMove, false);
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-
+  
 var uniforms = {
     time: { value: 0 },
-    resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
+    resolution: { value: resolution }, 
     flowTexture: { value: null }
 };
 
 const bufferScene = new THREE.Scene();
-const bufferTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
+const bufferTarget = new THREE.WebGLRenderTarget(resolution.x, resolution.y, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
 
 var bufferUniforms = {
     time: { value: 0 },
-    resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
+    resolution: { value: resolution },
+    flowTexture: { value: null },
     mousePosition: { value: mousePos },
     dragDirection: { value: new THREE.Vector2() }
 };
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 1000);
+const camera = new THREE.PerspectiveCamera(45, resolution.z, 0.001, 1);
 camera.position.set(0, 0, 1);
-scene.add(camera);
-bufferScene.add(camera);
 
 const fullscreenMeshes = [];
 
 
 window.onresize = () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
-
-    let fullscreenScale = window.innerWidth / window.innerHeight;
-    let resolution = new THREE.Vector2(renderer.domElement.width, renderer.domElement.height);
+    resolution = new THREE.Vector3(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight);
   
-    bufferTarget.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = resolution.z;
+    camera.updateProjectionMatrix();
+    renderer.setSize(resolution.x, resolution.y);
+
+    bufferTarget.setSize(resolution.x, resolution.y);
 
     for (let i = 0; i < fullscreenMeshes.length; i++) 
     {
-        fullscreenMeshes[i].scale.set(fullscreenScale, 1, 1);
+        fullscreenMeshes[i].scale.set(resolution.z, 1, 1);
     }
 
     uniforms.resolution.value = resolution;
@@ -67,18 +67,23 @@ function SceneTime()
     return (Date.now() / 1000) - start;
 }
 
+var deltaTime;
 
-var lastMouse = mousePos;
 function RenderFrame() 
 {
     requestAnimationFrame(RenderFrame);
-
+    
+   
+    mouseDirection = mousePos.clone().sub(lastMouse);
+  
+    lastMouse = mousePos.clone();
+  
     let time = SceneTime();
+     
+    bufferUniforms.time.value = time - deltaTime;
+    deltaTime = time;
 
-    var newMouse = mousePos.clone();
-    var mouseDirection = newMouse.sub(lastMouse).normalize();
-
-    bufferUniforms.time.value = time;
+    bufferUniforms.flowTexture.value = bufferTarget.texture;
     bufferUniforms.mousePosition.value = mousePos;
     bufferUniforms.dragDirection.value = mouseDirection;
 
@@ -87,11 +92,11 @@ function RenderFrame()
    
     uniforms.time.value = time;
     uniforms.flowTexture.value = bufferTarget.texture;
-    
+      
     renderer.setRenderTarget(null);
     renderer.render(scene, camera);
 }
-  
+   
 RenderFrame();
 
 
@@ -105,7 +110,7 @@ function AddFullscreenPlane(shader)
     } );
 
     const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-    planeMesh.scale.set(window.innerWidth / window.innerHeight, 1, 1);
+    planeMesh.scale.set(resolution.z, 1, 1);
         
     scene.add(planeMesh);
     fullscreenMeshes.push(planeMesh);
@@ -124,7 +129,7 @@ function AddBufferPlane(shader)
     } );
 
     const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-    planeMesh.scale.set(window.innerWidth / window.innerHeight, 1, 1);
+    planeMesh.scale.set(resolution.z, 1, 1);
         
     bufferScene.add(planeMesh);
     fullscreenMeshes.push(planeMesh);
