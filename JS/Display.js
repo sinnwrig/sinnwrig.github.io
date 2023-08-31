@@ -111,21 +111,11 @@ function RenderFrame()
 RenderFrame();
 
 
-function AddFullscreenPlane(shader, targetScene)
+function AddFullscreenPlane(targetScene, material)
 {
     const planeGeometry = new THREE.PlaneGeometry();
 
-    let time = SceneTime();
-    
-    const planeMaterial = new THREE.ShaderMaterial( {
-        uniforms: {
-            time: { value: time },
-            resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
-        },
-        fragmentShader: shader
-    } );
-
-    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    const planeMesh = new THREE.Mesh(planeGeometry, material);
     planeMesh.scale.set(window.innerWidth / window.innerHeight, 1, 1);
         
     targetScene.add(planeMesh);
@@ -143,9 +133,32 @@ async function LoadFullscreenShader(url, targetScene)
     const segments = new URL(url).pathname.split('/');
     const last = segments.pop() || segments.pop();
     console.log('Loaded shader ' + last);
-    return AddFullscreenPlane(shader, targetScene);
+
+    return shader;
 }
 
 // Fetch fragment shader
-LoadFullscreenShader('https://sinnwrig.github.io/Shaders/Fragment.hlsl', scene);
-LoadFullscreenShader('https://sinnwrig.github.io/Shaders/FlowTexture.hlsl', bufferScene);
+LoadFullscreenShader('https://sinnwrig.github.io/Shaders/Fragment.hlsl').then((shader) => {
+    const planeMaterial = new THREE.ShaderMaterial( {
+        uniforms: {
+            time: { value: SceneTime() },
+            resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
+            flowTexture: { value: bufferTexture }
+        },
+        fragmentShader: shader
+    } );
+
+    AddFullscreenPlane(scene, material);
+});
+
+LoadFullscreenShader('https://sinnwrig.github.io/Shaders/FlowTexture.hlsl').then((shader) => {
+    const planeMaterial = new THREE.ShaderMaterial( {
+        uniforms: {
+            time: { value: SceneTime() },
+            resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
+            mousePosition: { value : mousePos },
+            dragDirection: { value : mousePos.sub(lastMousePos).normalize() }
+        }, 
+        fragmentShader: shader
+    } );
+});
