@@ -12,5 +12,5 @@ void main(void)
     nMouse = mousePosition / resolution;
     float mouseDist = length(uv - nMouse);
 
-    gl_FragColor = vec4(1.0, 0.5, 0.5, 0.0) / mouseDist;
+    gl_FragColor = vec4(1.0, 0.5, 0.5, 0.0) + (vec4(0.0, 0.5, 0.5, 0.0) / mouseDist);
 }
