@@ -96,6 +96,7 @@ function RenderFrame()
         if (object.material) 
         {
             object.material.uniforms.time.value = time;
+            object.material.uniforms.flowTexture.value = bufferTexture;
         }
     });
 
@@ -128,7 +129,8 @@ function AddFullscreenPlane(shader)
     const planeMaterial = new THREE.ShaderMaterial( {
         uniforms: {
             time: { value: time },
-            resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) }
+            resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
+            flowTexture: { value: bufferTexture }
         },
         fragmentShader: shader
     } );
