@@ -119,13 +119,11 @@ function AddFullscreenPlane(shader)
 async function LoadFullscreenShader(url)
 {
     const response = await fetch(url);
-    const text = await response.text();
+    const shader = await response.text();
 
     const segments = new URL(url).pathname.split('/');
     const last = segments.pop() || segments.pop();
     console.log('Loaded shader ' + last);
-    AddFullscreenPlane(shader);
-
     return AddFullscreenPlane(shader);
 }
 
