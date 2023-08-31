@@ -85,7 +85,7 @@ void main(void)
     float dir = texture(flowTexture, gl_FragCoord.xy / resolution.xy).x;
       
 	float f = noise(vec3(uv * 2.0, time)); 
-	color = 1,0 - saturate(vec4(cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831))));
+	color = 1.0 - saturate(vec4(cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831))));
           
   gl_FragColor = color;
 }
