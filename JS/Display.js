@@ -35,9 +35,6 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 
-const bufferScene = new THREE.Scene();
-var bufferTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
-
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 1000);
 camera.position.set(0, 0, 1);
 scene.add(camera);
@@ -75,7 +72,6 @@ function SceneTime()
 }
 
 
-var lastMousePos = mousePos;
 function RenderFrame() 
 {
     requestAnimationFrame(RenderFrame);
@@ -90,42 +86,37 @@ function RenderFrame()
         }
     });
 
-    const mouseVector = mousePos.sub(lastMousePos).normalize();
-
-    bufferScene.traverse(function(object) 
-    {
-        if (object.material) 
-        {
-            object.material.uniforms.time.value = time;
-            object.material.uniforms.mousePosition.value = mousePos;
-            object.material.uniforms.dragDirection.value = mouseVector;
-        }
-    });
-
-    lastMousePos = mousePos;
-
-    renderer.render(bufferScene, camera, bufferTexture);
     renderer.render(scene, camera);
 }
   
 RenderFrame();
 
 
-function AddFullscreenPlane(targetScene, material)
+function AddFullscreenPlane(shader)
 {
     const planeGeometry = new THREE.PlaneGeometry();
 
-    const planeMesh = new THREE.Mesh(planeGeometry, material);
+    let time = SceneTime();
+    
+    const planeMaterial = new THREE.ShaderMaterial( {
+        uniforms: {
+            time: { value: time },
+            resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) }
+        },
+        fragmentShader: shader
+    } );
+
+    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
     planeMesh.scale.set(window.innerWidth / window.innerHeight, 1, 1);
         
-    targetScene.add(planeMesh);
+    scene.add(planeMesh);
     fullscreenMeshes.push(planeMesh);
 
     return planeMesh;
 }
 
 
-async function LoadFullscreenShader(url, targetScene)
+async function LoadFullscreenShader(url)
 {
     const response = await fetch(url);
     const shader = await response.text();
@@ -133,32 +124,8 @@ async function LoadFullscreenShader(url, targetScene)
     const segments = new URL(url).pathname.split('/');
     const last = segments.pop() || segments.pop();
     console.log('Loaded shader ' + last);
-
-    return shader;
+    return AddFullscreenPlane(shader);
 }
 
 // Fetch fragment shader
-LoadFullscreenShader('https://sinnwrig.github.io/Shaders/Fragment.hlsl').then((shader) => {
-    const planeMaterial = new THREE.ShaderMaterial( {
-        uniforms: {
-            time: { value: SceneTime() },
-            resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
-            flowTexture: { value: bufferTexture }
-        },
-        fragmentShader: shader
-    } );
-
-    AddFullscreenPlane(scene, material);
-});
-
-LoadFullscreenShader('https://sinnwrig.github.io/Shaders/FlowTexture.hlsl').then((shader) => {
-    const planeMaterial = new THREE.ShaderMaterial( {
-        uniforms: {
-            time: { value: SceneTime() },
-            resolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
-            mousePosition: { value : mousePos },
-            dragDirection: { value : mousePos.sub(lastMousePos).normalize() }
-        }, 
-        fragmentShader: shader
-    } );
-});
+LoadFullscreenShader('https://sinnwrig.github.io/Shaders/Fragment.hlsl');
