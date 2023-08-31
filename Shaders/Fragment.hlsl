@@ -1,5 +1,7 @@
 uniform float time;
 uniform vec2 resolution;
+uniform sampler2D flowTexture;
+
       
 #define LINE_W 0.1
 #define AA 15.0 / resolution.y
@@ -77,6 +79,8 @@ void main(void)
 	{
 	    color = vec4(0.0);
 	}
-      
+	
+	color = texture(flowTexture, u);
+
     gl_FragColor = color;
 }
