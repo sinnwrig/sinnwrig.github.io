@@ -5,13 +5,16 @@
 		<title>Sinnwrig Portfolio</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <link rel="stylesheet" href="style.css">
 	</head>
   
 	<body style="margin: 0;">  
+
         <p hidden="true", id="shader-1">
 uniform float time;
 uniform vec3 resolution;
 uniform sampler2D flowTexture;
+uniform float lightMode;
 
       
 #define LINE_W 0.1
@@ -80,12 +83,17 @@ void main(void)
 	uv = (uv - resolution.xy * 0.5) / resolution.y;
 	vec2 u2 = uv;   
       
-    vec4 color = vec4(0.0);
+  vec4 color = vec4(0.0);
   
-    float dir = texture(flowTexture, gl_FragCoord.xy / resolution.xy).x;
+  float dir = texture(flowTexture, gl_FragCoord.xy / resolution.xy).x;
       
 	float f = noise(vec3(uv * 2.0, time)); 
-	color = vec4(1.0) - saturate(vec4(cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831))));
+	color = vec4(cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831)));
+          
+  if (lightMode == 1.0) 
+  {
+      color = vec4(1.0) - color;        
+  }
           
   gl_FragColor = color;
 }
@@ -96,7 +104,7 @@ uniform vec3 resolution;
 uniform sampler2D flowTexture;
           
 uniform vec2 mousePosition;
-uniform vec2 deltaPosition;
+uniform vec2 lastPosition;
 
 #define FADE_POWER 0.1
 
@@ -104,7 +112,7 @@ void main(void)
 {
     vec2 uv = gl_FragCoord.xy;
           
-    vec2 prevValues = texture(flowTexture, uv / resolution.xy);
+    vec2 prevValues = texture(flowTexture, uv / resolution.xy).xy;
     
     float direction = 0.0;
     float influence = distance(uv, mousePosition * resolution.xy);
@@ -113,5 +121,10 @@ void main(void)
 }
         </p>
         <script type="module" src="JS/Display.js"></script>
+    
+      <label id="switchValue" class="switch" style="display:flex; position:absolute">
+        <input type="checkbox">
+        <span class="slider round"></span>
+      </label>
     </body>
 </html>

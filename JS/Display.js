@@ -2,12 +2,11 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 
 var mousePos = new THREE.Vector2();
 var lastMouse = new THREE.Vector2();
+var mouseDirection = new THREE.Vector2();
 var resolution = new THREE.Vector3(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight);
 
 function onDocumentMouseMove(event)
 {   
-    lastMouse = mousePos.clone();
-
     mousePos.x = (event.offsetX / resolution.x);
     mousePos.y = 1 - (event.offsetY / resolution.y);
 }
@@ -22,9 +21,17 @@ const scene = new THREE.Scene();
 var uniforms = {
     time: { value: 0 },
     resolution: { value: resolution }, 
-    flowTexture: { value: null }
+    flowTexture: { value: null },
+    lightMode: { value: 0 }
 };
 
+
+document.getElementById("switchValue").onchange = function(event) 
+{
+    uniforms.lightMode.value = event.target.checked ? 0 : 1;
+    console.log(event.target.checked);
+}
+  
 const bufferScene = new THREE.Scene();
 const bufferTarget = new THREE.WebGLRenderTarget(resolution.x, resolution.y, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
 
@@ -33,7 +40,7 @@ var bufferUniforms = {
     resolution: { value: resolution },
     flowTexture: { value: null },
     mousePosition: { value: mousePos },
-    deltaPosition: { value: lastMouse }
+    dragDirection: { value: new THREE.Vector2() }
 };
 
 const camera = new THREE.PerspectiveCamera(45, resolution.z, 0.001, 1);
@@ -68,13 +75,17 @@ function SceneTime()
     return (Date.now() / 1000) - start;
 }
 
-
 var deltaTime;
 
 function RenderFrame() 
 {
     requestAnimationFrame(RenderFrame);
-
+    
+   
+    mouseDirection = mousePos.clone().sub(lastMouse);
+  
+    lastMouse = mousePos.clone();
+  
     let time = SceneTime();
      
     bufferUniforms.time.value = time - deltaTime;
@@ -82,7 +93,7 @@ function RenderFrame()
 
     bufferUniforms.flowTexture.value = bufferTarget.texture;
     bufferUniforms.mousePosition.value = mousePos;
-    bufferUniforms.deltaPosition.value = lastMouse;
+    bufferUniforms.dragDirection.value = mouseDirection;
 
     renderer.setRenderTarget(bufferTarget);
     renderer.render(bufferScene, camera);
@@ -145,7 +156,6 @@ async function LoadShader(url)
     console.log('Loaded shader ' + last);
     return shader;
 }
-
 
 // Fetch fragment shader
 LoadShader('https://sinnwrig.github.io/Shaders/Fragment.hlsl').then((shader) => {
