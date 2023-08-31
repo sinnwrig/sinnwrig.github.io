@@ -80,12 +80,12 @@ void main(void)
 	uv = (uv - resolution.xy * 0.5) / resolution.y;
 	vec2 u2 = uv;   
       
-  vec4 color = vec4(0.0);
+    vec4 color = vec4(0.0);
   
-  float dir = texture(flowTexture, gl_FragCoord.xy / resolution.xy).x;
+    float dir = texture(flowTexture, gl_FragCoord.xy / resolution.xy).x;
       
 	float f = noise(vec3(uv * 2.0, time)); 
-	color = vec4(cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831)));
+	color = 1 - saturate(vec4(cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831))));
           
   gl_FragColor = color;
 }
@@ -96,7 +96,7 @@ uniform vec3 resolution;
 uniform sampler2D flowTexture;
           
 uniform vec2 mousePosition;
-uniform vec2 dragDirection;
+uniform vec2 deltaPosition;
 
 #define FADE_POWER 0.1
 
