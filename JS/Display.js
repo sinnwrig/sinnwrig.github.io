@@ -5,6 +5,7 @@ var mousePos = new THREE.Vector2(0, 0);
 mousePos.x /= window.innerWidth;
 mousePos.y /= window.innerHeight;
 
+
 document.onmousemove = handleMouseMove;
 function handleMouseMove(event) {
     var eventDoc, doc, body;
@@ -111,3 +112,20 @@ function AddFullscreenPlane(shader)
     scene.add(planeMesh);
     fullscreenMeshes.add(planeMesh);
 }
+
+
+function LoadFullscreenShader(url)
+{
+    fetch(url)
+    .then(response => response.text())
+    .then((shader) => 
+    {
+        const segments = new URL(url).pathname.split('/');
+        const last = segments.pop() || segments.pop();
+        console.log('Loaded shader ' + last);
+        AddFullscreenPlane(shader);
+    });
+}
+
+// Fetch fragment shader
+LoadFullscreenShader('https://sinnwrig.github.io/Shaders/Fragment.hlsl');
