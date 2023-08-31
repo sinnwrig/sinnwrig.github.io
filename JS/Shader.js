@@ -1,5 +1,5 @@
 // Fetch fragment shader
-const response = await fetch('https://sinnwrig.github.io/Shaders/Fragment.hlsl');
+const response = fetch('https://sinnwrig.github.io/Shaders/Fragment.hlsl');
 
 response.text().then(function(shader) {
     const segments = new URL(response.url).pathname.split('/');
