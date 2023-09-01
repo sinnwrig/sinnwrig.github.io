@@ -8,7 +8,7 @@ uniform vec2 lastPosition;
 #define PI 3.1415926538
 
 #define FALLOFF -12.0
-#define FADE_SPEED 0.5
+#define FADE_SPEED 0.25
           
 
 
