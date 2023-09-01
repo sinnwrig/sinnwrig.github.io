@@ -7,9 +7,11 @@ uniform vec2 lastPosition;
           
 #define PI 3.1415926538
 
-#define FALLOFF -25.0
+#define FALLOFF -12.0
 #define FADE_SPEED 0.5
           
+
+
 float dist2Line(vec2 a, vec2 b, vec2 p) 
 { 
     p -= a, b -= a;
@@ -20,7 +22,7 @@ float dist2Line(vec2 a, vec2 b, vec2 p)
 
 float Remap01(float v, float minOld, float maxOld) 
 {
-	  return clamp((v - minOld) / (maxOld - minOld), 0.0, 1.0);
+	return clamp((v - minOld) / (maxOld - minOld), 0.0, 1.0);
 }
           
           
