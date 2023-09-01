@@ -1,14 +1,15 @@
 uniform float time;
-uniform vec2 resolution;
+uniform vec3 resolution;
 uniform sampler2D flowTexture;
+uniform float lightMode;
 
       
 #define LINE_W 0.1
 #define AA 15.0 / resolution.y
       
 #define GRID_SCALE 24.0
-#define GRID_X 12.0
-#define GRID_Y 6.0
+#define GRID_X 24.0
+#define GRID_Y 12.0
 
 
 
@@ -64,23 +65,27 @@ float cell(vec2 uv)
 
 void main(void) 
 {
-    vec2 u = gl_FragCoord.xy;
+    vec2 uv = gl_FragCoord.xy;
 			
-	u = (u - resolution.xy * 0.5) / resolution.y;
-	vec2 u2 = u;   
+	uv = (uv - resolution.xy * 0.5) / resolution.y;
+	vec2 u2 = uv;   
       
-    vec4 color = vec4(0.0);
+  vec4 color = vec4(0.0);
+  
+  vec4 flowInfo = texture(flowTexture, gl_FragCoord.xy / resolution.xy);
       
-	float f = noise(vec3(u * 2.0, time));
-	color = vec4(cell(rotate2D(fract(u * 16.0) - 0.5, f * 6.2831)));
-			
-	// 24 by 12 border.
-	if (abs(u2.x * GRID_SCALE) > GRID_X || abs(u2.y * GRID_SCALE) > GRID_Y)
-	{
-	    color = vec4(0.0);
-	}
-	
-	color = texture(flowTexture, u);
-
-    gl_FragColor = color;
+  uv *= 2.0;
+	float f = noise(vec3(uv * 2.0, time));
+  f = mix(f, flowInfo.x, flowInfo.y);
+          
+	color = vec4(cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831)));
+          
+  if (lightMode == 0.0) 
+  {
+      color = vec4(1.0) - color;        
+  }
+          
+        
+          
+  gl_FragColor = color; 
 }
