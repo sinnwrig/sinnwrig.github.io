@@ -195,21 +195,21 @@ async function LoadShader(url)
 
 // Fetch fragment shader
 LoadShader('https://sinnwrig.github.io/Shaders/Fragment.hlsl').then((shader) => {
-    shader = document.getElementById("shader-1").textContent;
+    //shader = document.getElementById("shader-1").textContent;
   
     AddFullscreenPlane(shader);
 }); 
 
 
 LoadShader('https://sinnwrig.github.io/Shaders/FlowTexture.hlsl').then((shader) => {
-    shader = document.getElementById("shader-2").textContent;
+    //shader = document.getElementById("shader-2").textContent;
   
     AddBufferPlane(shader); 
 });
 
 
-LoadShader('https://sinnwrig.github.io/Shaders/FlowTexture.hlsl').then((shader) => {
-    shader = document.getElementById("shader-3").textContent;
+LoadShader('https://sinnwrig.github.io/Shaders/Blit.hlsl').then((shader) => {
+    //shader = document.getElementById("shader-3").textContent;
   
     AddTempPlane(shader); 
 });
