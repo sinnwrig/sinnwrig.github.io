@@ -1,21 +1,22 @@
 uniform float time;
 uniform vec3 resolution;
 uniform sampler2D flowTexture;
-uniform float lightMode;
+uniform vec3 cellColor;
+uniform vec3 backgroundColor;
+uniform float lineWidth;
+uniform float blur;
 
-
-#define LINE_W 0.1
-#define AA 15.0 / resolution.y
+#define AA blur / resolution.y
 
 
 //3D gradient noise by Íñigo Quílez
 vec3 hash(vec3 p)
 {
-	p = vec3( dot(p, vec3(127.1, 311.7, 74.7)),
-			  dot(p, vec3(269.5, 183.3, 246.1)),
-			  dot(p, vec3(113.5, 271.9, 124.6)));
+	p = vec3( dot(p,vec3(127.1,311.7, 74.7)),
+			  dot(p,vec3(269.5,183.3,246.1)),
+			  dot(p,vec3(113.5,271.9,124.6)));
 
-	return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+	return -1.0 + 2.0*fract(sin(p)*43758.5453123);
 }
 
 
@@ -46,15 +47,15 @@ float dist2Line(vec2 a, vec2 b, vec2 p)
 
 
 vec2 rotate2D(vec2 _st, float _angle)
-{
-    _st = mat2(cos(_angle), -sin(_angle), sin(_angle), cos(_angle)) * _st;
-    return _st;
+{ 
+    return mat2(cos(_angle), -sin(_angle),
+                sin(_angle), cos(_angle))*_st;
 }
 
 
 float cell(vec2 uv)
 {
-	return smoothstep(LINE_W + AA, LINE_W, dist2Line(vec2(-0.3, 0), vec2(0.3, 0), uv));
+	return smoothstep(lineWidth + AA, lineWidth, dist2Line(vec2(-0.3, 0), vec2(0.3, 0), uv));
 }
 
 
@@ -63,9 +64,7 @@ void main(void)
     vec2 uv = gl_FragCoord.xy;
 			
 	uv = (uv - resolution.xy * 0.5) / resolution.y;
-	vec2 u2 = uv;   
-      
-  	vec4 color = vec4(0.0);
+	vec2 u2 = uv;  
   
   	vec4 flowInfo = texture(flowTexture, gl_FragCoord.xy / resolution.xy);
       
@@ -73,12 +72,7 @@ void main(void)
 	float f = noise(vec3(uv * 2.0, time));
   	f = mix(f, flowInfo.x, flowInfo.y);
           
-	color = vec4(cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831)));
-          
-  	if (lightMode == 0.0) 
-  	{
-  	    color = vec4(1.0) - color;        
-  	}
+	float value = cell(rotate2D(fract(uv * 16.0) - 0.5, f * 6.2831));
              
-  	gl_FragColor = color; 
+  	gl_FragColor = mix(cellColor, backgroundColor, value); 
 }
