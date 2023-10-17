@@ -30,7 +30,7 @@ var imageMaterial = null;
 
 var bufferUniforms = { 
     sourceTexture: { value: null },
-    falloff: { value: -12.0 },
+    falloff: { value: -8.0 },
     fadeSpeed: { value: 0.25 },
 };
 
@@ -74,7 +74,7 @@ function SwitchTheme(event)
 
 
 window.addEventListener('resize', OnResize, true);
-document.getElementById("switchValue").onchange = SwitchTheme;
+document.getElementById('switchValue').onchange = SwitchTheme;
 
 renderer.setSize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
