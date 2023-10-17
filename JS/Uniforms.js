@@ -62,10 +62,11 @@ function OnResize()
 {
     resolution = new THREE.Vector3(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight);
     defaultUniforms.resolution.value = resolution;
+    console.log("Resize");
 }
 
 
-window.addEventListener('mousemove', OnDocumentMouseMove, false);
-window.onresize = OnResize;
+window.addEventListener('mousemove', OnDocumentMouseMove, true);
+window.addEventListener('resize', OnResize, true);
 
 UpdateDefaultUniforms();

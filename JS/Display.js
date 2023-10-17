@@ -3,6 +3,9 @@ import * as SHADER from './Shader.js';
 import * as BLIT from './Blit.js';
 import * as UNIFORM from './Uniforms.js';
 
+
+// TODO : Get a version of dis working on muh page cause it looks cool : https://www.shadertoy.com/view/4sKBz3
+
 var white = new THREE.Vector3(1, 1, 1);
 var black = new THREE.Vector3(0, 0, 0);
 
@@ -33,9 +36,13 @@ var bufferUniforms = {
 
 var bufferMaterial = null;
 
+
 function RenderFrame() 
 {
     requestAnimationFrame(RenderFrame);
+
+    if (!imageMaterial || !bufferMaterial)
+        return;
 
     BLIT.Blit(bufferTarget, tempTarget, renderer);
 
@@ -66,6 +73,7 @@ function SwitchTheme(event)
 }
 
 
+window.addEventListener('resize', OnResize, true);
 document.getElementById("switchValue").onchange = SwitchTheme;
 
 renderer.setSize(window.innerWidth, window.innerHeight, window.devicePixelRatio);

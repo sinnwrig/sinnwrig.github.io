@@ -9,7 +9,7 @@ uniform float blur;
 #define STRAND_SEGMENTS 6
 #define AA blur / resolution.y
 
-#include "Shaders/Include/Util.hlsl"
+#include "Shaders/Include/Math.hlsl"
 
 
 float cell(vec2 uv)

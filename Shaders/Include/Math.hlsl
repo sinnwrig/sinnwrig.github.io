@@ -1,3 +1,6 @@
+#define PI 3.14159265359
+
+
 //3D gradient noise by Íñigo Quílez
 vec3 hash(vec3 p)
 {
@@ -6,6 +9,14 @@ vec3 hash(vec3 p)
 			  dot(p,vec3(113.5,271.9,124.6)));
 
 	return -1.0 + 2.0*fract(sin(p)*43758.5453123);
+}
+
+//Hash without Sine by David Hoskins.
+float hash13(vec3 p3)
+{
+        p3  = fract(p3 * 0.1031);
+    p3 += dot(p3, p3.yzx + 19.19);
+    return fract((p3.x + p3.y) * p3.z);
 }
 
 

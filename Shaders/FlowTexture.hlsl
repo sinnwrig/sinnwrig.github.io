@@ -8,11 +8,9 @@ uniform vec2 mouseDelta;
 uniform float falloff;
 uniform float fadeSpeed;
           
-#define PI 3.1415926538
 
+#include "Shaders/Include/Math.hlsl"
 
-#include "Shaders/Include/Util.hlsl"
-          
 
 float Remap01(float v, float minOld, float maxOld) 
 {
