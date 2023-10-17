@@ -1,23 +1,17 @@
 uniform float deltaTime;
 uniform vec3 resolution;
-uniform sampler2D flowTexture;
+uniform sampler2D sourceTexture;
           
 uniform vec2 mousePosition;
-uniform vec2 lastPosition;
+uniform vec2 mouseDelta;
+
+uniform float falloff;
+uniform float fadeSpeed;
           
 #define PI 3.1415926538
 
-#define FALLOFF -12.0
-#define FADE_SPEED 0.25
-          
 
-
-float dist2Line(vec2 a, vec2 b, vec2 p) 
-{ 
-    p -= a, b -= a;
-	float h = clamp(dot(p, b) / dot(b, b), 0.0, 1.0); 
-	return length(p - b * h);                       
-}
+#include "Shaders/Include/Util.hlsl"
           
 
 float Remap01(float v, float minOld, float maxOld) 
@@ -26,26 +20,30 @@ float Remap01(float v, float minOld, float maxOld)
 }
           
           
-void main(void) 
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {         
-    vec2 uv = gl_FragCoord.xy; 
+    vec2 uv = fragCoord.xy; 
     vec2 mouse = mousePosition * resolution.xy;
-    vec2 lastMouse = lastPosition * resolution.xy;
-          
+    vec2 lastMouse = mouseDelta * resolution.xy;
+
     float dist = (dist2Line(mouse, lastMouse, uv) / resolution.y) * 100.0;
-    float influence = exp(dist / FALLOFF);
-          
+
+    // Exponential falloff from cursor
+    float influence = exp(dist / falloff);
+    
+    // Direction vector strength is determined by distance
     vec2 dir = normalize(mouse - lastMouse) * influence;
           
+    // Convert to 
     float direction = atan(dir.y, dir.x);
     
     direction = Remap01(direction, -PI, PI);
           
-    vec4 prevColor = texture(flowTexture, uv / resolution.xy);
-    prevColor.y -= deltaTime * FADE_SPEED;       
+    vec4 prevColor = texture(sourceTexture, uv / resolution.xy);
+    prevColor.y -= deltaTime * fadeSpeed;       
     
     direction = mix(prevColor.x, direction, influence);
     influence = max(influence, prevColor.y);
     
-    gl_FragColor = vec4(direction, influence, 0.0, 0.0);
+    fragColor = vec4(direction, influence, 0.0, 0.0);
 }
