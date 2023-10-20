@@ -8,7 +8,7 @@ export var resolution = new THREE.Vector3(window.innerWidth, window.innerHeight,
 export var time = undefined;
 export var lastTime = undefined
 export var deltaTime = 0.0;
-export var frame = 0;
+export var frame = -1;
 
 export var mousePos = new THREE.Vector2();
 export var mouseDelta = new THREE.Vector2();
@@ -59,7 +59,6 @@ function OnDocumentMouseMove(event)
 function OnResize()
 {
     resolution = new THREE.Vector3(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight);
-    console.log("Resize");
 }
 
 

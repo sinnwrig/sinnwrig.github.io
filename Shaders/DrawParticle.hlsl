@@ -1,8 +1,15 @@
 uniform sampler2D sourceTexture;
-//uniform sampler2D vectorTexture;
 uniform vec3 resolution;
 uniform float deltaTime;
 uniform float frame;
+
+
+uniform float distribution;
+uniform float density;
+uniform float fadeSpeed;
+uniform float noiseScale;
+uniform float particleSize;
+uniform float particleSpeed;
 
 // Particle distribution
 #define DISTRIBUTION 0.0003
@@ -28,8 +35,10 @@ uniform float frame;
 vec2 getFlow(vec2 position)
 {
     //vec2 direction = 2.0 * texture(vectorTexture, position * NOISE_SCALE).xy - 1.0;
+    // Height determines scale;
+    position /= resolution.y;
 
-    return normalNoise(position, NOISE_SCALE, 354.459).xy * 0.3;
+    return normalNoise(position, noiseScale, 354.459).xy * 0.3;
 }
 
 float rand(vec2 p)
@@ -41,11 +50,11 @@ float rand(vec2 p)
 vec2 sampleParticle(vec2 fragCoord) 
 {
     // Kill random pixels to lower global density
-    if (rand(fragCoord) < DENSITY) 
+    if (rand(fragCoord) < density) 
         return vec2(0);
         
     // Kernel needs to be big enough to handle particles that shift more than one unit
-    const int kernSize = int(ceil(SPEED));
+    int kernSize = int(ceil(particleSpeed));
 
     // Sample neighboring pixels to check if this pixel will have a particle in it
     for (int x = -kernSize; x <= kernSize; x++) 
@@ -62,7 +71,7 @@ vec2 sampleParticle(vec2 fragCoord)
             if (fragment == vec2(0))
             {
                 // Probability of initializing
-                if (rand(coords) < DISTRIBUTION) 
+                if (rand(coords) < distribution) 
                 {
                     fragment = fragCoord + vec2(x, y); // Initialize particle at position 
                 }
@@ -73,7 +82,7 @@ vec2 sampleParticle(vec2 fragCoord)
             }
 
             // Move particle with flow
-            fragment += getFlow(coords) * SPEED;
+            fragment += getFlow(fragCoord + vec2(x, y)) * particleSpeed;
 
         #ifdef SQR_DIST
             // Square distance check gives rounder particles at larger sizes
@@ -81,14 +90,14 @@ vec2 sampleParticle(vec2 fragCoord)
             float distSqr = dot(vec, vec);
                 
             // If the particle is close enough to pixel, use it
-            if (distSqr < PART_SIZE * PART_SIZE)
+            if (distSqr < particleSize * particleSize)
             {
                 return fragment;
             }
         #else
             // Original rectangle distance check
             // If the particle is close enough to pixel, use it
-            if (abs(fragment.x - fragCoord.x) < PART_SIZE && abs(fragment.y - fragCoord.y) < PART_SIZE) 
+            if (abs(fragment.x - fragCoord.x) < particleSize && abs(fragment.y - fragCoord.y) < particleSize) 
             {
                 return fragment;
             }
@@ -106,7 +115,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec2 particle = sampleParticle(fragCoord);
     
     float fade = texture(sourceTexture, fragCoord / resolution.xy).z;
-    fade -= (FADE_POW * deltaTime);
+    fade -= fadeSpeed * deltaTime;
 
     fragColor.xyz = vec3(particle, fade);
 
@@ -114,5 +123,10 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     if (particle != vec2(0.0))
     {
         fragColor.z = 1.0;
+    }
+
+    if (frame < 1.0)
+    {
+        fragColor.z = 0.0;
     }
 }
