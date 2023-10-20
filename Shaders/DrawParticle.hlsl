@@ -1,7 +1,12 @@
+// Original shader by davidar at https://www.shadertoy.com/view/4sKBz3
+
+// Modified to use a single buffer and simplex noise.
+// Shadertoy version at https://www.shadertoy.com/view/DstBWX
+
 uniform sampler2D sourceTexture;
 uniform vec3 resolution;
 uniform float deltaTime;
-uniform float frame;
+uniform int frame;
 
 
 uniform float distribution;
@@ -20,7 +25,9 @@ uniform float particleSpeed;
 
 vec2 getFlow(vec2 position)
 {
+    // Vector texture
     //vec2 direction = 2.0 * texture(vectorTexture, position * NOISE_SCALE).xy - 1.0;
+
     // Height determines scale;
     position /= resolution.y;
 
@@ -29,7 +36,10 @@ vec2 getFlow(vec2 position)
 
 float rand(vec2 p)
 {
-    return hash13(vec3(p, frame));
+    // After around ten million frames hash starts to break down, so mod it back.
+    float frameMod = mod(float(frame), 1000000.0);
+
+    return hash13(vec3(p, frameMod));
 }
 
 // Returns the position of a particle in the pixel, and 0 if there are none
@@ -48,18 +58,19 @@ vec2 sampleParticle(vec2 fragCoord)
         for (int y = -kernSize; y <= kernSize; y++) 
         {
             // Get UV coordinates with offset
-            vec2 coords = (fragCoord + vec2(x, y)) / resolution.xy;
+            vec2 offsetCoords = fragCoord + vec2(x, y);
+            vec2 uv = offsetCoords / resolution.xy;
 
             // Sample particle buffer
-            vec2 fragment = texture(sourceTexture, coords).xy;
+            vec2 fragment = texture2D(sourceTexture, uv).xy;
 
             // Is the particle uninitialized?
             if (fragment == vec2(0))
             {
                 // Probability of initializing
-                if (rand(coords) < distribution) 
+                if (rand(uv) < distribution) 
                 {
-                    fragment = fragCoord + vec2(x, y); // Initialize particle at position 
+                    fragment = offsetCoords; // Initialize particle at position 
                 }
                 else 
                 {
@@ -68,7 +79,7 @@ vec2 sampleParticle(vec2 fragCoord)
             }
 
             // Move particle with flow
-            fragment += getFlow(fragCoord + vec2(x, y)) * particleSpeed;
+            fragment += getFlow(offsetCoords) * particleSpeed;
 
         #ifdef SQR_DIST
             // Square distance check gives rounder particles at larger sizes
@@ -100,7 +111,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 particle = sampleParticle(fragCoord);
     
-    float fade = texture(sourceTexture, fragCoord / resolution.xy).z;
+    float fade = texture2D(sourceTexture, fragCoord / resolution.xy).z;
     fade -= fadeSpeed * deltaTime;
 
     fragColor.xyz = vec3(particle, fade);
@@ -111,7 +122,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         fragColor.z = 1.0;
     }
 
-    if (frame < 1.0)
+    if (frame < 1)
     {
         fragColor.z = 0.0;
     }
