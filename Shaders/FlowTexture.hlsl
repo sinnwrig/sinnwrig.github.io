@@ -6,16 +6,15 @@ uniform vec2 mouseDelta;
 
 #define falloff 5.0
 #define fadeSpeed 0.9
-          
-
-#include "Shaders/Include/Math.hlsl"
 
 
-float Remap01(float v, float minOld, float maxOld) 
-{
-	return clamp((v - minOld) / (maxOld - minOld), 0.0, 1.0);
+float dist2Line(vec2 a, vec2 b, vec2 p) 
+{ 
+    p -= a, b -= a;
+	float h = clamp(dot(p, b) / dot(b, b), 0.0, 1.0); 
+	return length(p - b * h);                       
 }
-          
+ 
           
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {         

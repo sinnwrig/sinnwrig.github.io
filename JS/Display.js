@@ -5,14 +5,19 @@ import * as UNIFORM from './Uniforms.js';
 
 
 const renderer = new THREE.WebGLRenderer();
-renderer.precision = 'highp';
+renderer.precision = 'highp'; // Highest precision does not change much
 renderer.autoClear = false; // No need to clear- shader overwrites everything.
-  
-// No filtering for particles
-const bufferA = new THREE.WebGLRenderTarget(1, 1, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter});
-const bufferB = new THREE.WebGLRenderTarget(1, 1, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter});
+
+// Type MUST be float type or else texture screws up and stays in 0-1 range or something similar
+const bufferA = new THREE.WebGLRenderTarget(1, 1, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, type:THREE.FloatType });
+const bufferB = new THREE.WebGLRenderTarget(1, 1, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, type:THREE.FloatType });
 
 var texture = new THREE.TextureLoader().load('Textures/noyse2.png');
+texture.type = THREE.FloatType;
+texture.flipY = false;
+texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+texture.needsUpdate = true;
 
 var source = bufferA;
 var dest = bufferB;

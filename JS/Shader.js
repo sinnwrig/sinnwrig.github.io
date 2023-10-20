@@ -28,7 +28,7 @@ export function CreateMaterial(shaderURL, materialUniforms, onCreate, onProgress
 // Preprocess the provided shader
 // Replaces all occurences of #include "{file path}" with the provided contents of the file at that path. 
 // Does not replace #include <threejs_shader_chunk> occurences.
-// Adds a function at the end that calls mainImage() to make shader syntax similar to ShaderToy
+// Adds a function at the end that calls mainImage() to make shader syntax like ShaderToy, since I prefer knowing what variables I'm working with.
 export async function Preprocess(shader, onProgress, onError)
 {
     let result = "";
@@ -49,7 +49,7 @@ export async function Preprocess(shader, onProgress, onError)
 
                 let includeFile = await LoadFile(includePath, onProgress, onError);
 
-                line = "/* BEGIN PREPROCESSOR INCLUDE */\n" + includeFile + "\n/* END PREPROCESSOR INCLUDE */";  
+                line = "// BEGIN PREPROCESSOR INCLUDE\n" + includeFile + "\n// END PREPROCESSOR INCLUDE";  
             } 
         }
 
