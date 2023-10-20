@@ -16,9 +16,6 @@ uniform float noiseScale;
 uniform float particleSize;
 uniform float particleSpeed;
 
-// Use a square distance check for particles. Gives a rounder look at larger particle sizes
-//#define SQR_DIST
-
 #include "Shaders/Include/Hash.hlsl"
 #include "Shaders/Include/Noise.hlsl"
 
@@ -68,37 +65,16 @@ vec2 sampleParticle(vec2 fragCoord)
             if (fragment == vec2(0))
             {
                 // Probability of initializing
-                if (rand(uv) < distribution) 
-                {
-                    fragment = offsetCoords; // Initialize particle at position 
-                }
-                else 
-                {
-                    continue; // Don't initialize particle- skip iteration
-                }
+                if (rand(uv) > distribution) continue; // Don't initialize particle- skip iteration
+                fragment = offsetCoords; // Initialize particle at position 
             }
 
             // Move particle with flow
             fragment += getFlow(offsetCoords) * particleSpeed;
 
-        #ifdef SQR_DIST
-            // Square distance check gives rounder particles at larger sizes
-            vec2 vec = fragment.xy - fragCoord.xy;
-            float distSqr = dot(vec, vec);
-                
-            // If the particle is close enough to pixel, use it
-            if (distSqr < particleSize * particleSize)
-            {
-                return fragment;
-            }
-        #else
-            // Original rectangle distance check
             // If the particle is close enough to pixel, use it
             if (abs(fragment.x - fragCoord.x) < particleSize && abs(fragment.y - fragCoord.y) < particleSize) 
-            {
                 return fragment;
-            }
-        #endif
         }
     }
 

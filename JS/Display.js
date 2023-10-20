@@ -32,12 +32,12 @@ var particleUniforms = {
     deltaTime: { value: null },
     frame: { value: null },
 
-    distribution: { value: 0.0003 }, // Particle distribution
-    density: { value: 0.015 }, // Global particle density
+    distribution: { value: 0.0002 }, // Particle distribution
+    density: { value: 0.005 }, // Global particle density
     fadeSpeed: { value: 2.0 }, // u/s at which trails fade
-    noiseScale: { value: 3.0 }, // Noise sample scale
+    noiseScale: { value: 2.0 }, // Noise sample scale
     particleSize: { value: 0.5}, // Particle size - Larger size will make particles coagulate, smaller size causes particles to dissapear.
-    particleSpeed: { value: 1.0 }, // Speed at which particles move. Larger values reduce performance as shader needs to sample further away to compensate for additional particle movement.
+    particleSpeed: { value: 2.0 }, // Speed at which particles move. Larger values reduce performance as shader needs to sample further away to compensate for additional particle movement.
 };
 
 var imageMaterial = null;
