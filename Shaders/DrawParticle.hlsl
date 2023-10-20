@@ -16,10 +16,14 @@ uniform float noiseScale;
 uniform float particleSize;
 uniform float particleSpeed;
 
-#define MAX_KERNEL_RAD 5
+#define MAX_ITERATIONS 10
 
 #include "Shaders/Include/Hash.hlsl"
 #include "Shaders/Include/Noise.hlsl"
+
+
+#define UNROLLABLE_LOOP(minR, maxR, iter, val) for (int iter = 0; iter < MAX_ITERATIONS; iter++) { if (iter > abs(minR - maxR) + 1) break; val = (iter - abs(minR - maxR)) + 1;
+#define END_LOOP }
 
 
 vec2 getFlow(vec2 position)
@@ -51,13 +55,11 @@ vec2 sampleParticle(vec2 fragCoord)
     // Kernel needs to be big enough to handle particles that shift more than one unit
     int kernSize = int(ceil(particleSpeed));
 
-    const int maxK = MAX_KERNEL_RAD;
-
-    // Sample neighboring pixels to check if this pixel will have a particle in it
-    for (int x = -min(kernSize, maxK); x <= min(kernSize, maxK); x++) 
-    {
-        for (int y = -min(kernSize, maxK); y <= min(kernSize, maxK); y++) 
-        {
+    int i, x;
+    UNROLLABLE_LOOP(-kernSize, kernSize, i, x)
+        int j, y;
+        UNROLLABLE_LOOP(-kernSize, kernSize, j, y)
+        
             // Get UV coordinates with offset
             vec2 offsetCoords = fragCoord + vec2(x, y);
             vec2 uv = offsetCoords / resolution.xy;
@@ -79,8 +81,8 @@ vec2 sampleParticle(vec2 fragCoord)
             // If the particle is close enough to pixel, use it
             if (abs(fragment.x - fragCoord.x) < particleSize && abs(fragment.y - fragCoord.y) < particleSize) 
                 return fragment;
-        }
-    }
+        END_LOOP
+    END_LOOP
 
     // No particle nearby
     return vec2(0);
