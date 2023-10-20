@@ -40,7 +40,16 @@ export function Blit(source, target, renderer, material)
 
     // Set source texture if it exists and the property is available
     if (source && material.uniforms.hasOwnProperty('sourceTexture'))
-        material.uniforms.sourceTexture.value = source.texture;
+    {
+        if (source.isTexture)
+        {
+            material.uniforms.sourceTexture.value = source;
+        }
+        else
+        {
+            material.uniforms.sourceTexture.value = source.texture;
+        }
+    }
 
     // Set resolution property if it exists
     if (material.uniforms.hasOwnProperty('resolution'))

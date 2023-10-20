@@ -1,3 +1,6 @@
+#ifndef MATH_INCLUDED
+#define MATH_INCLUDED
+
 #define PI 3.14159265359
 
 
@@ -10,15 +13,6 @@ vec3 hash(vec3 p)
 
 	return -1.0 + 2.0*fract(sin(p)*43758.5453123);
 }
-
-//Hash without Sine by David Hoskins.
-float hash13(vec3 p3)
-{
-        p3  = fract(p3 * 0.1031);
-    p3 += dot(p3, p3.yzx + 19.19);
-    return fract((p3.x + p3.y) * p3.z);
-}
-
 
 float noise(in vec3 p) 
 {
@@ -52,3 +46,5 @@ vec2 rotate2D(vec2 _st, float _angle)
                 sin(_angle),cos(_angle)) * _st;
     return _st;
 }
+
+#endif
