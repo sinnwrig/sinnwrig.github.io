@@ -16,6 +16,8 @@ uniform float noiseScale;
 uniform float particleSize;
 uniform float particleSpeed;
 
+#define MAX_KERNEL_RAD 5
+
 #include "Shaders/Include/Hash.hlsl"
 #include "Shaders/Include/Noise.hlsl"
 
@@ -49,10 +51,12 @@ vec2 sampleParticle(vec2 fragCoord)
     // Kernel needs to be big enough to handle particles that shift more than one unit
     int kernSize = int(ceil(particleSpeed));
 
+    const int maxK = MAX_KERNEL_RAD;
+
     // Sample neighboring pixels to check if this pixel will have a particle in it
-    for (int x = -kernSize; x <= kernSize; x++) 
+    for (int x = -min(kernSize, maxK); x <= min(kernSize, maxK); x++) 
     {
-        for (int y = -kernSize; y <= kernSize; y++) 
+        for (int y = -min(kernSize, maxK); y <= min(kernSize, maxK); y++) 
         {
             // Get UV coordinates with offset
             vec2 offsetCoords = fragCoord + vec2(x, y);
