@@ -11,20 +11,6 @@ uniform float noiseScale;
 uniform float particleSize;
 uniform float particleSpeed;
 
-// Particle distribution
-#define DISTRIBUTION 0.0003
-// Global particle density
-#define DENSITY 0.015
-
-// u/s at which trails fade
-#define FADE_POW 2.0
-// Noise texture sample scale
-#define NOISE_SCALE 3.0
-
-// Particle size - Larger size will make particles coagulate, smaller size causes particles to dissapear.
-#define PART_SIZE 0.5
-#define SPEED 1.0
-
 // Use a square distance check for particles. Gives a rounder look at larger particle sizes
 //#define SQR_DIST
 
