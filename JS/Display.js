@@ -89,7 +89,6 @@ function SwitchTheme(event)
 
     console.log(checked);
 }
-event.target.
 
 window.addEventListener('resize', OnResize, true);
 document.getElementById('switchValue').onchange = SwitchTheme;
