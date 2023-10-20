@@ -22,7 +22,7 @@ uniform float particleSpeed;
 #include "Shaders/Include/Noise.hlsl"
 
 
-#define UNROLLABLE_LOOP(minR, maxR, iter, val) for (int iter = 0; iter < MAX_ITERATIONS; iter++) { if (iter > abs(minR - maxR) + 1) break; val = (iter - abs(minR - maxR)) + 1;
+#define UNROLLABLE_LOOP(minR, maxR, iter, val) for (int iter = 0; iter < MAX_ITERATIONS; iter++) { if (iter > int(abs(float(minR - maxR))) + 1) break; val = (iter - int(abs(float(minR - maxR)))) + 1;
 #define END_LOOP }
 
 
@@ -59,7 +59,7 @@ vec2 sampleParticle(vec2 fragCoord)
     UNROLLABLE_LOOP(-kernSize, kernSize, i, x)
         int j, y;
         UNROLLABLE_LOOP(-kernSize, kernSize, j, y)
-        
+
             // Get UV coordinates with offset
             vec2 offsetCoords = fragCoord + vec2(x, y);
             vec2 uv = offsetCoords / resolution.xy;
