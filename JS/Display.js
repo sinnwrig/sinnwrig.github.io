@@ -14,8 +14,8 @@ const bufferB = new THREE.WebGLRenderTarget(1, 1, { minFilter: THREE.NearestFilt
 
 var texture = new THREE.TextureLoader().load('Textures/noyse2.png');
 
-var source = bufferB;
-var dest = bufferA;
+var source = bufferA;
+var dest = bufferB;
 
 
 // Define uniforms
