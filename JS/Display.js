@@ -102,8 +102,8 @@ RenderFrame();
 
 function DebugAvgFramerate()
 {
-    console.log(frameCount);
+    console.log(frameCount / 5);
     frameCount = 0;
 }
 
-setInterval(DebugAvgFramerate, 1000);
+setInterval(DebugAvgFramerate, 5000);
