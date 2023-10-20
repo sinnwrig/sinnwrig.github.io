@@ -14,8 +14,8 @@ uniform float frame;
 #define NOISE_SCALE 0.03
 
 // Particle size - Larger size will make particles coagulate, smaller size can cause particles to dissapear.
-#define KERN 2
-#define PART_SIZE 5.0
+#define KERN 1
+#define PART_SIZE 0.5
 
 #include "Shaders/Include/Hash.hlsl"
 

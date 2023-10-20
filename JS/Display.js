@@ -5,6 +5,7 @@ import * as UNIFORM from './Uniforms.js';
 
 
 const renderer = new THREE.WebGLRenderer();
+renderer.precision = 'highp';
 renderer.autoClear = false; // No need to clear- shader overwrites everything.
   
 // No filtering for particles
