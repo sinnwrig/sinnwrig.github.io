@@ -21,6 +21,8 @@ uniform float particleSpeed;
 #include "Shaders/Include/Hash.hlsl"
 #include "Shaders/Include/Noise.hlsl"
 
+#define NORMALIZE_VALUE
+
 
 #define UNROLLABLE_LOOP(minR, maxR, iter, val) for (int iter = 0; iter < MAX_ITERATIONS; iter++) { if (iter > int(abs(float(minR - maxR))) + 1) break; val = (iter - int(abs(float(minR - maxR)))) + 1;
 #define END_LOOP }
@@ -28,11 +30,8 @@ uniform float particleSpeed;
 
 vec2 getFlow(vec2 position)
 {
-    // Vector texture
-    //vec2 direction = 2.0 * texture(vectorTexture, position * NOISE_SCALE).xy - 1.0;
-
     // Height determines scale;
-    position /= resolution.y;
+    position = position / resolution.y;
 
     return normalNoise(position, noiseScale, 354.459).xy * 0.3;
 }
@@ -55,9 +54,6 @@ vec2 sampleParticle(vec2 fragCoord)
     // Kernel needs to be big enough to handle particles that shift more than one unit
     int kernSize = int(ceil(particleSpeed));
 
-    vec2 fragUV = fragCoord / resolution.xy;
-    vec2 sizeScl = vec2(particleSize) / resolution.xy;
-
     int i, x;
     UNROLLABLE_LOOP(-kernSize, kernSize, i, x)
         int j, y;
@@ -69,20 +65,25 @@ vec2 sampleParticle(vec2 fragCoord)
 
             // Sample particle buffer
             vec2 fragment = texture2D(sourceTexture, uv).xy;
+        
+        #ifdef NORMALIZE_VALUE
+            // Unpack normalized values
+            fragment = fragment * resolution.xy;
+        #endif
 
             // Is the particle uninitialized?
             if (fragment == vec2(0))
             {
                 // Probability of initializing
                 if (rand(uv) > distribution) continue; // Don't initialize particle- skip iteration
-                fragment = uv; // Initialize particle at position 
+                fragment = offsetCoords; // Initialize particle at position 
             }
 
             // Move particle with flow
-            fragment += (getFlow(offsetCoords) * particleSpeed) / resolution.xy;
+            fragment += getFlow(offsetCoords) * particleSpeed;
 
             // If the particle is close enough to pixel, use it
-            if (abs(fragment.x - fragUV.x) < sizeScl.x && abs(fragment.y - fragUV.y) < sizeScl.y) 
+            if (abs(fragment.x - fragCoord.x) < particleSize && abs(fragment.y - fragCoord.y) < particleSize) 
                 return fragment;
         END_LOOP
     END_LOOP
@@ -101,14 +102,16 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
     fragColor.xyz = vec3(particle, fade);
 
+#ifdef NORMALIZE_VALUE
+    // Normalize particle position
+    fragColor.xy = fragColor.xy / resolution.xy;
+#endif
+
     // If there is a particle, reset fade
     if (particle != vec2(0.0))
-    {
         fragColor.z = 1.0;
-    }
 
+    // Clear buffer if on the first frame
     if (frame < 1)
-    {
         fragColor.z = 0.0;
-    }
 }
