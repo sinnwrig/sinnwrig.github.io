@@ -55,6 +55,9 @@ vec2 sampleParticle(vec2 fragCoord)
     // Kernel needs to be big enough to handle particles that shift more than one unit
     int kernSize = int(ceil(particleSpeed));
 
+    vec2 fragUV = fragCoord / resolution.xy;
+    vec2 sizeScl = vec2(particleSize) / resolution.xy;
+
     int i, x;
     UNROLLABLE_LOOP(-kernSize, kernSize, i, x)
         int j, y;
@@ -72,14 +75,14 @@ vec2 sampleParticle(vec2 fragCoord)
             {
                 // Probability of initializing
                 if (rand(uv) > distribution) continue; // Don't initialize particle- skip iteration
-                fragment = offsetCoords; // Initialize particle at position 
+                fragment = uv; // Initialize particle at position 
             }
 
             // Move particle with flow
-            fragment += getFlow(offsetCoords) * particleSpeed;
+            fragment += (getFlow(offsetCoords) * particleSpeed) / resolution.xy;
 
             // If the particle is close enough to pixel, use it
-            if (abs(fragment.x - fragCoord.x) < particleSize && abs(fragment.y - fragCoord.y) < particleSize) 
+            if (abs(fragment.x - fragUV.x) < sizeScl.x && abs(fragment.y - fragUV.y) < sizeScl.y) 
                 return fragment;
         END_LOOP
     END_LOOP

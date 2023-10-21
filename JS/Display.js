@@ -6,9 +6,10 @@ import * as UNIFORM from './Uniforms.js';
 const renderer = new THREE.WebGLRenderer();
 renderer.autoClear = false;
 
-// Type MUST be float type or else texture screws up and stays in 0-1 range or something similar
 const bufferA = new THREE.WebGLRenderTarget(1, 1, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, type:THREE.FloatType });
+bufferA.autoClear = false;
 const bufferB = new THREE.WebGLRenderTarget(1, 1, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, type:THREE.FloatType });
+bufferB.autoClear = false;
 
 var source = bufferA;
 var dest = bufferB;

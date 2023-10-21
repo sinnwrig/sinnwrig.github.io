@@ -4,7 +4,7 @@ import * as THREE from './Three.js';
 import * as UNIFORMS from './Uniforms.js';
 
 const blitScene = new THREE.Scene();
-const planeGeometry = new THREE.PlaneGeometry();
+const planeGeometry = new THREE.PlaneBufferGeometry();
 const camera = new THREE.PerspectiveCamera(1, 1, 0.001, 1);
 
 var blitMaterial = new THREE.ShaderMaterial( {
