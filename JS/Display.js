@@ -93,6 +93,7 @@ function SwitchTheme(event)
 
 window.addEventListener('resize', OnResize, true);
 document.getElementById('switchValue').onchange = SwitchTheme;
+
 document.body.appendChild(renderer.domElement);
 
 SHADER.CreateMaterial('Shaders/Fragment.hlsl', uniforms, (material) => imageMaterial = material); 
