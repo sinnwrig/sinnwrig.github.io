@@ -223,7 +223,9 @@ function GetFloatExtensions(gl)
     // WebGL 1
     if (OESFloat && !EXTFloat)
     {
+        console.log('WebGl1 float texture');
         webGL1 = true;
+        
         if (!gl.getExtension('WEBGL_color_buffer_float'))
             renderTexSupport = false;
     }
