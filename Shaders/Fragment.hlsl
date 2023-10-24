@@ -12,21 +12,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
     fragColor.w = 1.0;
     fragColor.xyz = mix(background, color, fade);
-    
-    /*
-    bool cOK = true;
-    bool dOK = true;
-    compareCompressed(fade.xyz, cOK, dOK);
-
-
-    // If neither is ok
-    if (!cOK && !dOK)
-        fragColor.xyz = vec3(1.0, 0.0, 0.0);
-    else if (!cOK)
-        fragColor.xyz = vec3(0.0, 1.0, 0.0);
-    else if (!dOK)
-        fragColor.xyz = vec3(0.0, 0.0, 1.0);
-    */
 }
 
 

@@ -8,6 +8,11 @@ export class Vector2
         this.y = y;
         this.isVector2 = true;
     }
+
+    Clone()
+    {
+        return new Vector2(this.x, this.y);
+    }
 }
 
 
@@ -19,6 +24,11 @@ export class Vector3
         this.y = y;
         this.z = z;
         this.isVector3 = true;
+    }
+
+    Clone()
+    {
+        return new Vector3(this.x, this.y, this.z);
     }
 }
 
@@ -32,5 +42,10 @@ export class Vector4
         this.z = z;
         this.w = w;
         this.isVector4 = true;
+    }
+
+    Clone()
+    {
+        return new Vector4(this.x, this.y, this.z, this.w);
     }
 }

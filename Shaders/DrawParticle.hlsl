@@ -5,6 +5,7 @@
 precision mediump float;
 
 uniform sampler2D sourceTexture;
+uniform sampler2D vectorTexture;
 uniform vec3 resolution;
 uniform float deltaTime;
 uniform float frame;
@@ -31,10 +32,14 @@ uniform float particleSpeed;
 
 vec2 getFlow(vec2 position)
 {
-    // Height determines scale;
-    position = position / resolution.y;
+    // Noise aspect is determined by screen height
+    vec2 noise = normalNoise(position / resolution.y, noiseScale, 354.459).xy;
 
-    return normalNoise(position, noiseScale, 354.459).xy * 0.3;
+    vec3 vectorTex = texture2D(vectorTexture, position / resolution.xy).xyz;
+
+    vec2 direction = mix(noise, vectorTex.xy, vectorTex.z);
+
+    return normalize(direction);
 }
 
 float rand(vec2 p)

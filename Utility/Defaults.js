@@ -1,6 +1,7 @@
 // Utilities for setting commonly used uniform values.
 
 import { Vector2, Vector3 } from './Vectors.js'; 
+import { CallbackList } from './Loaders/CallbackList.js';
 
 
 export var resolution = new Vector3(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight);
@@ -12,6 +13,9 @@ export var frame = -1;
 
 export var mousePos = new Vector2();
 export var mouseDelta = new Vector2();
+
+export var canvas = undefined;
+export var resizeCallbacks = new CallbackList();
 
 
 export function SetUniforms(uniforms)
@@ -47,27 +51,54 @@ export function UpdateDefaults(timestamp)
 }
 
 
-function OnDocumentMouseMove(event)
+function GetCursorPosition(event)
+{
+    let rect = event.target.getBoundingClientRect();
+    let x = event.clientX - rect.left;
+    let y = event.clientY - rect.top;
+
+    return new Vector2(x / rect.width, 1 - (y / rect.height));
+}
+
+function OnCanvasMouseMove(event)
 {   
-    mouseDelta.x = mousePos.x;
-    mouseDelta.y = mousePos.y;
-  
-    mousePos.x = (event.offsetX / window.innerWidth);
-    mousePos.y = 1 - (event.offsetY / window.innerHeight);
+    mouseDelta = mousePos.Clone();
+    mousePos = GetCursorPosition(event);
+}
+
+
+function OnMouseEnter(event)
+{
+    mousePos = GetCursorPosition(event);
+    mouseDelta = mousePos.Clone();
 }
 
 
 export function OnResize()
 {
     let pixelRatio = window.devicePixelRatio || 1;
-    let width = window.innerWidth * pixelRatio;
-    let height = window.innerHeight * pixelRatio;
+
+    var positionInfo = canvas.getBoundingClientRect();
+
+    var width = positionInfo.width * pixelRatio;
+    var height = positionInfo.height * pixelRatio;
 
     resolution = new Vector3(width, height, width / height);
+
+    canvas.width = width;
+    canvas.height = height;
+
+    resizeCallbacks.Invoke(width, height);
 }
 
 
-window.addEventListener('mousemove', OnDocumentMouseMove, true);
-window.addEventListener('resize', OnResize, true);
+export function Setup(outputCanvas)
+{
+    canvas = outputCanvas;
 
-OnResize();
+    canvas.addEventListener('mousemove', OnCanvasMouseMove, true);
+    canvas.addEventListener('mouseenter', OnMouseEnter, true);
+    window.addEventListener('resize', OnResize, true);
+
+    OnResize();
+}

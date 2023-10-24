@@ -170,11 +170,11 @@ function GetInternalFormat(gl, glFormat, glType, isRenderTexture)
 
     if (glFormat === WebGL2RenderingContext.RGBA) 
     {
-        if (glType === WebGLRenderingContext.FLOAT) internalFormat = WebGL2RenderingContext.RGBA32F;
-        if (glType === WebGLRenderingContext.HALF_FLOAT) internalFormat = WebGL2RenderingContext.RGBA16F;
-        if (glType === WebGLRenderingContext.UNSIGNED_BYTE) internalFormat = WebGL2RenderingContext.RGBA8;
-        if (glType === WebGLRenderingContext.UNSIGNED_SHORT_4_4_4_4) internalFormat = WebGL2RenderingContext.RGBA4;
-        if (glType === WebGLRenderingContext.UNSIGNED_SHORT_5_5_5_1) internalFormat = WebGL2RenderingContext.RGB5_A1;
+        if (glType === WebGL2RenderingContext.FLOAT) internalFormat = WebGL2RenderingContext.RGBA32F;
+        if (glType === WebGL2RenderingContext.HALF_FLOAT) internalFormat = WebGL2RenderingContext.RGBA16F;
+        if (glType === WebGL2RenderingContext.UNSIGNED_BYTE) internalFormat = WebGL2RenderingContext.RGBA8;
+        if (glType === WebGL2RenderingContext.UNSIGNED_SHORT_4_4_4_4) internalFormat = WebGL2RenderingContext.RGBA4;
+        if (glType === WebGL2RenderingContext.UNSIGNED_SHORT_5_5_5_1) internalFormat = WebGL2RenderingContext.RGB5_A1;
     }  
 
 

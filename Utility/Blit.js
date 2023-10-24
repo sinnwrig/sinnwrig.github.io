@@ -7,19 +7,15 @@ import { Texture } from "./Texture.js";
 
 var blitShader = undefined;
 
-
 var uniforms = { resolution: { value: new Vector3(0, 0, 0) }, sourceTexture: { value: null } };
 const blitFrag = "precision mediump float; uniform sampler2D sourceTexture; uniform vec3 resolution; void main(void) { gl_FragColor = texture2D(sourceTexture, gl_FragCoord.xy / resolution.xy); }"
 
 
-export function InitBlit(gl)
-{
-    blitShader = new Shader(gl, null, blitFrag, uniforms);
-}
-
-
 export function Blit(gl, source, target, shader, clearTarget)
 {
+    if (!blitShader)
+        blitShader = new Shader(gl, null, blitFrag, uniforms);
+
     if (!target)
         throw new Error("Blit target is not set!");
 
