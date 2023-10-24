@@ -7,10 +7,12 @@ export class Mesh
 
         this.vertexBuffer = {}; 
         this.indexBuffer = {}; 
+        this.isMesh = true;
+        this.isInitialized = false;
     }
 
 
-    Bind(gl)
+    UpdateData(gl)
     {
         // Bind vertex positions
         this.vertexBuffer = gl.createBuffer();
@@ -21,14 +23,26 @@ export class Mesh
         this.indexBuffer = gl.createBuffer();
         gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         gl.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, this.indices, WebGLRenderingContext.STATIC_DRAW);
+
+        this.isInitialized = true;
     }
 
 
-    Draw(gl)
+    Draw(gl, shader)
     {  
-        // Bind buffers and draw
-        gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, this.vertexBuffer);
-        gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        if (!this.isInitialized)
+        {
+            // Bind and upload buffer data
+            this.UpdateData(gl);
+        }
+        else
+        {
+            // Bind buffers and draw
+            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, this.vertexBuffer);
+            gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        }
+
+        shader.Use(gl);
         gl.drawElements(WebGLRenderingContext.TRIANGLES, this.indices.length, WebGLRenderingContext.UNSIGNED_SHORT, 0);
     }
 }

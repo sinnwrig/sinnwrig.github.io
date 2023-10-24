@@ -2,11 +2,12 @@
 
 // Modified to use a single buffer and simplex noise.
 // Shadertoy version at https://www.shadertoy.com/view/DstBWX
+precision mediump float;
 
 uniform sampler2D sourceTexture;
 uniform vec3 resolution;
 uniform float deltaTime;
-uniform int frame;
+uniform float frame;
 
 
 uniform float distribution;
@@ -18,8 +19,8 @@ uniform float particleSpeed;
 
 #define MAX_ITERATIONS 10
 
-#include "Shaders/Include/Hash.hlsl"
-#include "Shaders/Include/Noise.hlsl"
+#include "/Shaders/Include/Hash.hlsl"
+#include "/Shaders/Include/Noise.hlsl"
 
 #define NORMALIZE_VALUE
 
@@ -112,6 +113,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         fragColor.z = 1.0;
 
     // Clear buffer if on the first frame
-    if (frame < 1)
+    if (frame < 1.0)
         fragColor.z = 0.0;
 }
+
+void main() { mainImage(gl_FragColor, gl_FragCoord.xy); }

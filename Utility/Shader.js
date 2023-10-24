@@ -1,19 +1,31 @@
-import { DefaultFileLoader } from "../ThreeScripts/FileLoader.js";
+import { DefaultFileLoader } from "./Loaders/FileLoader.js";
+import { Vector3 } from "./Vectors.js";
 
 
 const defaultVertex = "attribute vec2 inPos; void main() { gl_Position = vec4(inPos, 0.0, 1.0); }";
-const defaultFragment = "precision mediump float; uniform vec2 resolution; void main(void) { gl_FragColor = vec4(gl_FragCoord.xy / resolution.xy, 0.0, 1.0); }"
+const defaultFragment = "precision mediump float; uniform vec3 resolution; void main(void) { gl_FragColor = vec4(gl_FragCoord.xy / resolution.xy, 0.0, 1.0); }"
 
 
+const defaultUniforms = { resolution: { value: new Vector3(0, 0, 0) } };
+const defaultAttributes = { inPos: { isPointer: true, size: 2, type: WebGLRenderingContext.FLOAT } };
+
+
+// Shader is sort of a mixture between material/shader
 export class Shader 
 {
     constructor(gl, vertexSrc, fragmentSrc, uniforms, attributes) 
     {
-        if (vertexSrc === undefined)
+        if (!vertexSrc)
             vertexSrc = defaultVertex;
 
-        if (fragmentSrc === undefined)
+        if (!fragmentSrc)
             fragmentSrc = defaultFragment;
+
+        if (!uniforms)
+            uniforms = defaultUniforms;
+
+        if (!attributes)
+            attributes = defaultAttributes; 
 
         this.program = CompileShader(gl, vertexSrc, fragmentSrc);
 
@@ -33,6 +45,7 @@ export class Shader
 
         this.vertexSource = vertexSrc;
         this.fragmentSource = fragmentSrc;
+        this.isShader = true;
     }
 
 
@@ -57,12 +70,16 @@ export class Shader
     Use(gl) 
     {
         gl.useProgram(this.program);
+
+        this.UpdateUniforms(gl);
+        this.UpdateAttributes(gl);
     }
 
 
     UpdateUniforms(gl)
     {
-        gl.useProgram(this.program);
+        // Reset texture binding location
+        textureLoc = 0;
 
         for (let uniform in this.uniforms)
         {
@@ -74,8 +91,6 @@ export class Shader
 
     UpdateAttributes(gl)
     {
-        gl.useProgram(this.program);
-
         for (let attrib in this.attributes)
         {
             let attribObj = this.attributes[attrib];
@@ -84,20 +99,46 @@ export class Shader
     }
 }
 
+var traced = 0;
+
 
 function UpdateUniform(gl, uniform, location)
 {
-    let pos = location;
     let value = uniform.value;
 
-    if (!isNaN(value)) 
-        gl.uniform1f(pos, value);
-    else if (uniform.value.isVector2) 
-        gl.uniform2f(pos, value.x, value.y);
-    else if (uniform.value.isVector3) 
-        gl.uniform3f(pos, value.x, value.y, value.z);
-    else if (uniform.value.isVector4)
-        gl.uniform4f(pos, value.x, value.y, value.z, value.w);
+    if (!isNaN(value)) {
+        gl.uniform1f(location, value);
+    } else if (value.isVector2) {
+        gl.uniform2f(location, value.x, value.y);
+    } else if (value.isVector3) {
+        gl.uniform3f(location, value.x, value.y, value.z);
+    } else if (value.isVector4) {
+        gl.uniform4f(location, value.x, value.y, value.z, value.w);
+    } else if (value.isTexture)
+        BindTexture(gl, value, location);
+}
+
+
+var textureLoc = 0;
+
+function BindTexture(gl, texture, location)
+{
+    if (!texture.isCreated)
+        throw new Error("Attempting to bind nonexistent texture!");
+
+    if (textureLoc > 7)
+        throw new Error("Cannot bind more than 8 texture uniforms to shader program!");
+
+    let active = WebGLRenderingContext.TEXTURE0 + textureLoc;
+
+    gl.activeTexture(active);
+    gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, texture.glTexture);
+
+    // Tell the shader we bound the texture to texture unit
+    gl.uniform1i(location, textureLoc);
+
+    // Move to next texture position
+    textureLoc++;
 }
 
 
@@ -119,15 +160,15 @@ function UpdateAttribute(gl, attribute, location)
         return; 
     }
 
-    let value = uniform.value;
+    let value = attribute.value;
 
-    if (value instanceof Number) 
+    if (!isNaN(value)) 
         gl.vertexAttrib1f(pos, value);
-    else if (uniform.value.isVector2) 
+    else if (value.isVector2) 
         gl.vertexAttrib2f(pos, value.x, value.y);
-    else if (uniform.value.isVector3) 
+    else if (value.isVector3) 
         gl.vertexAttrib3f(pos, value.x, value.y, value.z);
-    else if (uniform.value.isVector4)
+    else if (value.isVector4)
         gl.vertexAttrib4f(pos, value.x, value.y, value.z, value.w);
 }
 
@@ -143,7 +184,7 @@ function CompileShader(gl, vert, frag)
     if (!gl.getShaderParameter(vs, WebGLRenderingContext.COMPILE_STATUS))
     {
         const log = gl.getShaderInfoLog(vs);
-        throw new Error(`Vertex shader failed to compile \n\n${log}`);
+        throw new Error(`Vertex shader failed to compile \n\n${log}\n\n${vert}`);
     }
 
     var fs = gl.createShader(WebGLRenderingContext.FRAGMENT_SHADER);
@@ -154,7 +195,7 @@ function CompileShader(gl, vert, frag)
     if (!gl.getShaderParameter(fs, WebGLRenderingContext.COMPILE_STATUS))
     {
         const log = gl.getShaderInfoLog(fs);
-        throw new Error(`Fragment shader failed to compile \n\n${log}`);
+        throw new Error(`Fragment shader failed to compile \n\n${log}\n\n${frag}`);
     }
 
     var program = gl.createProgram();
@@ -174,6 +215,7 @@ function CompileShader(gl, vert, frag)
 }
 
 
+// Handle all shader file includes
 async function Preprocess(shader, onProgress)
 {
     let result = "";
@@ -207,5 +249,5 @@ async function Preprocess(shader, onProgress)
 
 function UniqueNum() 
 {
-    return Date.now() + Math.random();
+    return Date.now() & Math.random() << Math.random();
 }
