@@ -1,3 +1,5 @@
+// Simple container for vertex and index buffers
+
 export class Mesh
 {
     constructor(vertices, indices)

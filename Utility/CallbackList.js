@@ -1,4 +1,4 @@
-// Object that holds a list of registered callback functions
+// Container that holds a list of registered callback functions
 
 export class CallbackList
 {

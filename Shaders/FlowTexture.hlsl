@@ -7,8 +7,9 @@ uniform float frame;
 uniform vec2 mousePos;
 uniform vec2 mouseDelta;
 
-#define MOUSE_FALLOFF 0.15
-#define FADE 0.15
+uniform float dragFalloff;
+uniform float attractionFalloff;
+uniform float fadeSpeed;
 
 #define PI 3.141592653589793
 
@@ -22,9 +23,9 @@ float dist2Line(vec2 a, vec2 b, vec2 p)
 }
 
 
-float falloff(float value)
+float falloff(float value, float falloff)
 {
-    return smoothstep(1.0, 0.0, value / MOUSE_FALLOFF);
+    return smoothstep(1.0, 0.0, value / falloff);
 }
  
           
@@ -38,14 +39,17 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     float dist = dist2Line(mouse, lastMouse, uv) / resolution.y;
 
     // Exponential falloff from cursor
-    float influence = falloff(dist) + 0.01;
+    float influence = falloff(dist, dragFalloff);
+    float inVecInfluence = falloff(dist, attractionFalloff);
 
-    vec2 direction = normalize(mouse - lastMouse);
+    vec2 dragDir = mouse - lastMouse;
+    vec2 toMouse = mouse - uv;
+    vec2 direction = normalize(mix(toMouse, dragDir, inVecInfluence));
           
     vec3 values = texture2D(sourceTexture, uv / resolution.xy).xyz;
 
     // Fade previous color
-    values.z = max(0.0, values.z - (deltaTime * FADE));       
+    values.z = max(0.0, values.z - (deltaTime * fadeSpeed));       
     values.z = max(influence, values.z);
 
     values.xy = mix(values.xy, direction, influence);

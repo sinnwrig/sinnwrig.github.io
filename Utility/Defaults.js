@@ -1,8 +1,7 @@
-// Utilities for setting commonly used uniform values.
-
 import { Vector2, Vector3 } from './Vectors.js'; 
-import { CallbackList } from './Loaders/CallbackList.js';
+import { CallbackList } from './CallbackList.js';
 
+// Utilities for setting commonly used uniform values
 
 export var resolution = new Vector3(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight);
 

@@ -1,6 +1,7 @@
 import { Texture } from "../Utility/Texture.js";
 import * as BLIT from "../Utility/Blit.js";
 
+// A two-testure buffer for blitting back and forth between targets
 
 export class RenderBuffer
 {
@@ -16,10 +17,13 @@ export class RenderBuffer
     }
 
 
-    SetSize(gl, width, height)
+    SetSize(gl, width, height, clearColor)
     {
         this.bufferA.SetSize(gl, width, height);
         this.bufferB.SetSize(gl, width, height);
+
+        if (clearColor.isVector4)
+            this.Clear(gl, clearColor);
     }
 
 

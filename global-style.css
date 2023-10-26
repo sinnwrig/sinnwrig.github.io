@@ -1,0 +1,22 @@
+:root 
+{
+    --backgroundColor: #e6e6e6;
+    --text: #1a1a1a;
+    --pad: 25px;
+}
+  
+
+[color-theme='dark'] 
+{
+    --backgroundColor: #0d0d0d;
+    --text: #f2f2f2;
+}
+
+  
+body 
+{
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--backgroundColor);
+    color: var(--text);
+}

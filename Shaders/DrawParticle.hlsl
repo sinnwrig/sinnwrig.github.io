@@ -104,7 +104,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec2 particle = sampleParticle(fragCoord);
     
     float fade = texture2D(sourceTexture, fragCoord / resolution.xy).z;
-    fade -= fadeSpeed * deltaTime;
+    fade = max(0.0, fade - fadeSpeed * deltaTime);
 
     fragColor.xyz = vec3(particle, fade);
 

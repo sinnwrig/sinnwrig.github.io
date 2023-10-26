@@ -1,9 +1,9 @@
-// Utility functions for blitting from one texture to another with a fullscreen mesh
-
 import { Shader } from "./Shader.js";
 import { fullscreenMesh } from "./Mesh.js";
 import { Vector3 } from "./Vectors.js";
 import { Texture } from "./Texture.js";
+
+// Utility functions for blitting from one texture to another with a fullscreen mesh
 
 var blitShader = undefined;
 

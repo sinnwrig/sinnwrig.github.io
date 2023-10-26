@@ -1,3 +1,5 @@
+
+// Get highest level WebGL context
 export function AutoGetContext(canvas, forceGL2)
 {
     let gl = canvas.getContext('webgl2');

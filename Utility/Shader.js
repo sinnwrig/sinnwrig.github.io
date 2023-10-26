@@ -1,7 +1,10 @@
-import { DefaultFileLoader } from "./Loaders/FileLoader.js";
 import { Vector3 } from "./Vectors.js";
 
+// Container for a compiled shader program
+// Handles getting and setting shader uniforms and attributes
 
+
+// The basic hello world fullscreen UV square
 const defaultVertex = "attribute vec2 inPos; void main() { gl_Position = vec4(inPos, 0.0, 1.0); }";
 const defaultFragment = "precision mediump float; uniform vec3 resolution; void main(void) { gl_FragColor = vec4(gl_FragCoord.xy / resolution.xy, 0.0, 1.0); }"
 
@@ -55,10 +58,10 @@ export class Shader
         let fragmentSrc = defaultFragment;
 
         if (vertexURL)
-            vertexSrc = await DefaultFileLoader.LoadAsync(vertexURL);
+            vertexSrc = await GetText(vertexURL);
 
         if (fragmentURL)
-            fragmentSrc = await DefaultFileLoader.LoadAsync(fragmentURL);
+            fragmentSrc = await GetText(fragmentURL);
 
         vertexSrc = await Preprocess(vertexSrc);
         fragmentSrc = await Preprocess(fragmentSrc);
@@ -98,8 +101,6 @@ export class Shader
         }
     }
 }
-
-var traced = 0;
 
 
 function UpdateUniform(gl, uniform, location)
@@ -215,8 +216,18 @@ function CompileShader(gl, vert, frag)
 }
 
 
+async function GetText(url)
+{
+    const request = new Request(url);
+    const response = await fetch(request);
+    const text = await response.text();
+
+    return text;
+}
+
+
 // Handle all shader file includes
-async function Preprocess(shader, onProgress)
+async function Preprocess(shader)
 {
     let result = "";
 
@@ -234,7 +245,7 @@ async function Preprocess(shader, onProgress)
             {
                 console.log("Including " + includePath);
 
-                let includeFile = await DefaultFileLoader.LoadAsync(includePath, onProgress);
+                let includeFile = await GetText(includePath);
 
                 line = "// BEGIN PREPROCESSOR INCLUDE\n" + includeFile + "\n// END PREPROCESSOR INCLUDE";  
             } 

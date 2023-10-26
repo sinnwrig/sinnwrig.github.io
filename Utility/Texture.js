@@ -1,3 +1,5 @@
+// Container for a WebGL texture
+
 export class Texture
 {
     constructor(width, height, settings = {})
