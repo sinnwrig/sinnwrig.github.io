@@ -11,12 +11,16 @@
   
 	<body style="margin: 0;">  
         <script type="module" src="JS/WebGl-Test.js"></script>
-    
-        <label id="switchValue" class="switch" style="display:flex; position:absolute;">
-            <input type="checkbox">
-            <span class="slider round"></span>
-        </label>
 
-        <canvas id="ogl-canvas" style="border:none; position:fixed; left:0; top:0; width:100%; height:100%;"></canvas>
+        <div class="canvas-holder">
+            <canvas id="ogl-canvas" style="border:none; position:fixed; left:0; top:0; width:100%; height:100%;"></canvas>
+        </div>
+
+        <div class="elements">
+            <label id="switchValue" class="switch" style="display:flex; position:relative;">
+                <input type="checkbox">
+                <span class="slider round"></span>
+            </label>
+        </div>
     </body>
 </html>

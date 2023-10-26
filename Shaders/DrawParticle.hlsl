@@ -116,10 +116,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     // If there is a particle, reset fade
     if (particle != vec2(0.0))
         fragColor.z = 1.0;
-
-    // Clear buffer if on the first frame
-    if (frame < 1.0)
-        fragColor.z = 0.0;
 }
 
 void main() { mainImage(gl_FragColor, gl_FragCoord.xy); }

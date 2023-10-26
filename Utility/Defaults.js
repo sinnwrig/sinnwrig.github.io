@@ -11,8 +11,8 @@ export var lastTime = undefined
 export var deltaTime = 0.0;
 export var frame = -1;
 
-export var mousePos = new Vector2();
-export var mouseDelta = new Vector2();
+export var mousePos = new Vector2(0.01, 0.0);
+export var mouseDelta = new Vector2(0.0, 0.0);
 
 export var canvas = undefined;
 export var resizeCallbacks = new CallbackList();
@@ -47,7 +47,8 @@ export function UpdateDefaults(timestamp)
     lastTime = time;
     time = timestamp;
     deltaTime = time - lastTime;
-    frame += 1;
+
+    frame++;
 }
 
 

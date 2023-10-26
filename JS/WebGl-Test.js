@@ -18,7 +18,6 @@ const nearFilter = WebGLRenderingContext.NEAREST;
 const particleBuffer = new RenderBuffer(1, 1, { minFilter: nearFilter, magFilter: nearFilter, type:WebGLRenderingContext.FLOAT });
 const mouseBuffer = new RenderBuffer(1, 1, { minFilter: nearFilter, magFilter: nearFilter, type:WebGLRenderingContext.FLOAT  });
 
-
 const offWhite = new Vector3(0.9, 0.9, 0.9);
 const offBlack = new Vector3(0.1, 0.1, 0.1);
 
@@ -86,11 +85,14 @@ function RenderFrame(timestamp)
 }  
 
 
-DEFAULTS.resizeCallbacks.Add((width, height) => 
+function OnResize(width, height)
 {
     particleBuffer.SetSize(gl, width, height);
     mouseBuffer.SetSize(gl, width, height);
-});
+}
+
+
+DEFAULTS.resizeCallbacks.Add(OnResize);
 
 DEFAULTS.Setup(canvas);
 
@@ -101,3 +103,5 @@ document.getElementById('switchValue').onchange = (event) =>
 };
 
 RenderFrame();
+
+setInterval(FPSHandler, 1000);

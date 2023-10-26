@@ -33,7 +33,7 @@ export class RenderBuffer
     }
 
 
-    Clear(color)
+    Clear(gl, color)
     {
         gl.clearColor(color.x, color.y, color.z, color.w);
         this.bufferA.BindToFramebuffer(gl, WebGLRenderingContext.COLOR_ATTACHMENT0);

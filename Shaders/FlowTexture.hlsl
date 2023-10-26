@@ -38,26 +38,19 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     float dist = dist2Line(mouse, lastMouse, uv) / resolution.y;
 
     // Exponential falloff from cursor
-    float influence = falloff(dist);
+    float influence = falloff(dist) + 0.01;
 
     vec2 direction = normalize(mouse - lastMouse);
           
     vec3 values = texture2D(sourceTexture, uv / resolution.xy).xyz;
 
     // Fade previous color
-    values.z -= deltaTime * FADE;       
+    values.z = max(0.0, values.z - (deltaTime * FADE));       
     values.z = max(influence, values.z);
 
     values.xy = mix(values.xy, direction, influence);
 
     fragColor.xyz = values;
-
-    // Clear buffer if on the first frame
-    if (frame < 1.0)
-    {
-        fragColor.xy = direction;
-        fragColor.z = 0.0;
-    }
 }
 
 
