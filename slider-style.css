@@ -42,11 +42,6 @@
     transition: .4s;
 }
   
-input:checked + .slider 
-{
-    background-color: var(--backgroundColor);
-}
-  
 input:checked + .slider:before 
 {
     -webkit-transform: translateX(26px);

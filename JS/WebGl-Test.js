@@ -115,7 +115,9 @@ function OnResize(width, height)
 }
 
 
-function UpdateStyle()
+var modeToggle = document.getElementById('modeSwitch');
+
+function UpdateStyle(darkTheme)
 {
     let style = getComputedStyle(document.body);
     let backgroundHex = style.getPropertyValue('--backgroundColor');
@@ -128,12 +130,30 @@ function UpdateStyle()
     imageUniforms.color.value = textCol;
 }
 
-
-document.getElementById('switchValue').onchange = (event) =>
+// Manual switch callback
+modeToggle.addEventListener('change', (ev) => 
 {
-    document.body.setAttribute("color-theme", event.target.checked ? "dark" : "light");
-    UpdateStyle();
-};
+    document.body.setAttribute("color-theme", ev.target.checked ? "dark" : "light");
+    UpdateStyle(ev.target.checked);
+});
+
+// Is user theme dark mode?
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) 
+{
+    console.log("dark");
+    modeToggle.checked = true;
+    document.body.setAttribute("color-theme", "dark");
+    UpdateStyle(true);
+}
+
+// User theme switch callback
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (ev) => 
+{
+    modeToggle.checked = ev.matches;
+    document.body.setAttribute("color-theme", ev.matches ? "dark" : "light");
+    UpdateStyle(ev.matches);
+});
+
 
 
 DEFAULTS.resizeCallbacks.Add(OnResize);
