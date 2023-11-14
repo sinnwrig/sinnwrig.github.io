@@ -38,7 +38,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     // Distance to the line created between the previous and current mouse drag, scaled by viewport height
     float dist = dist2Line(mouse, lastMouse, uv) / resolution.y;
 
-    // Exponential falloff from cursor
     float influence = falloff(dist, dragFalloff);
     float inVecInfluence = falloff(dist, attractionFalloff);
 
