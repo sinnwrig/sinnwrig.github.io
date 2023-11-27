@@ -140,7 +140,6 @@ modeToggle.addEventListener('change', (ev) =>
 // Is user theme dark mode?
 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) 
 {
-    console.log("dark");
     modeToggle.checked = true;
     document.body.setAttribute("color-theme", "dark");
     UpdateStyle(true);
