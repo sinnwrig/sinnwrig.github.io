@@ -41,10 +41,13 @@ export class Shader
 
         // Get locations and bind them to custom shader guid
         for (let uniform in uniforms)
+        {
+            // Uniform 'location' is an object with locations indexed by the shader GUID.
             (uniforms[uniform].location ??= {})[this.guid] ??= gl.getUniformLocation(this.program, uniform);
+        }
 
         for (let attrib in attributes)
-            (attributes[attrib].location ??= {})[this.guid] = gl.getAttribLocation(this.program, attrib);
+            (attributes[attrib].location ??= {})[this.guid] ??= gl.getAttribLocation(this.program, attrib);
 
         this.vertexSource = vertexSrc;
         this.fragmentSource = fragmentSrc;
@@ -151,11 +154,11 @@ function UpdateAttribute(gl, attribute, location)
     {        
         gl.enableVertexAttribArray(pos);
 
-        let size = attribute.size ? attribute.size : 1;
-        let type = attribute.type ? attribute.type : WebGLRenderingContext.BYTE;
-        let normalized = attribute.normalized ? attribute.normalized : false;
-        let stride = attribute.stride ? attribute.stride : 0;
-        let offset = attribute.offset ? attribute.offset : 0;
+        let size = attribute.size || 1;
+        let type = attribute.type || WebGLRenderingContext.BYTE;
+        let normalized = attribute.normalized || false;
+        let stride = attribute.stride || 0;
+        let offset = attribute.offset || 0;
 
         gl.vertexAttribPointer(pos, size, type, normalized, stride, offset);
         return; 
