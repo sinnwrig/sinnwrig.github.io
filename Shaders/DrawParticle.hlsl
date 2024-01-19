@@ -33,7 +33,7 @@ uniform float particleSpeed;
 vec2 getFlow(vec2 position)
 {
     // Noise aspect is determined by screen height
-    vec2 noise = normalNoise(position / resolution.y, noiseScale, 354.459).xy;
+    vec2 noise = vec2(0, -1);//normalNoise(position / resolution.y, noiseScale, 354.459).xy;
 
     vec3 vectorTex = texture2D(vectorTexture, position / resolution.xy).xyz;
 
