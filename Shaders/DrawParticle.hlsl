@@ -33,7 +33,7 @@ uniform float particleSpeed;
 vec2 getFlow(vec2 position)
 {
     // Noise aspect is determined by screen height
-    vec2 noise = vec2(0, -1);//normalNoise(position / resolution.y, noiseScale, 354.459).xy;
+    vec2 noise = mix(vec2(0, -1), normalNoise(position / resolution.y, noiseScale, 354.459).xy, 0.3);
 
     vec3 vectorTex = texture2D(vectorTexture, position / resolution.xy).xyz;
 
@@ -88,7 +88,7 @@ vec2 sampleParticle(vec2 fragCoord)
             // Move particle with flow
             fragment += getFlow(offsetCoords) * particleSpeed;
 
-            // If the particle is close enough to pixel, use it
+            // If the particle is close enough to pixel, save it
             if (abs(fragment.x - fragCoord.x) < particleSize && abs(fragment.y - fragCoord.y) < particleSize) 
                 return fragment;
         END_LOOP
@@ -99,23 +99,21 @@ vec2 sampleParticle(vec2 fragCoord)
 }
 
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord) 
+void main() 
 {
-    vec2 particle = sampleParticle(fragCoord);
+    vec2 particle = sampleParticle(gl_FragCoord.xy);
     
-    float fade = texture2D(sourceTexture, fragCoord / resolution.xy).z;
+    float fade = texture2D(sourceTexture, gl_FragCoord.xy / resolution.xy).z;
     fade = max(0.0, fade - fadeSpeed * deltaTime);
 
-    fragColor.xyz = vec3(particle, fade);
+    gl_FragColor.xyz = vec3(particle, fade);
 
 #ifdef NORMALIZE_VALUE
     // Normalize particle position
-    fragColor.xy = fragColor.xy / resolution.xy;
+    gl_FragColor.xy = gl_FragColor.xy / resolution.xy;
 #endif
 
     // If there is a particle, reset fade
     if (particle != vec2(0.0))
-        fragColor.z = 1.0;
+        gl_FragColor.z = 1.0;
 }
-
-void main() { mainImage(gl_FragColor, gl_FragCoord.xy); }

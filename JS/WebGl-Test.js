@@ -40,8 +40,8 @@ var mouseUniforms = {
     mouseDelta: { value: null },
 
     dragFalloff: { value: 0.15 },
-    attractionFalloff: { value: 0.05 },
-    fadeSpeed: { value: 0.1 }
+    attractionFalloff: { value: 0.005 },
+    fadeSpeed: { value: 0.5 }
 };
 Shader.LoadFromFile(gl, null, "/Shaders/FlowTexture.hlsl", mouseUniforms).then((shader) => mouseShader = shader);
 
@@ -55,8 +55,8 @@ var particleUniforms = {
     deltaTime: { value: null },
     frame: { value: null },
 
-    distribution: { value: 0.0002 }, // Particle distribution
-    density: { value: 0.005 }, // Global particle density
+    distribution: { value: 0.00003 }, // Particle distribution
+    density: { value: 0.003 }, // Global particle density
     fadeSpeed: { value: 2.0 }, // units/s at which trails fade
     noiseScale: { value: 2.0 }, // Noise sample scale
     particleSize: { value: 0.5}, // Particle size - Larger size will make particles coagulate, smaller size causes particles to dissapear.
@@ -89,7 +89,7 @@ function RenderFrame(timestamp)
 
 function FormatBytes(bytes, decimals = 2) 
 {
-    if (!+bytes) return '0 Bytes';
+    if (!bytes) return '0 Bytes';
 
     const k = 1000;
     const dm = decimals < 0 ? 0 : decimals;

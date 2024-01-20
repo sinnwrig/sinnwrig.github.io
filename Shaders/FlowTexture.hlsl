@@ -1,4 +1,4 @@
-precision highp float;
+precision mediump float;
 
 uniform sampler2D sourceTexture;
 uniform vec3 resolution;
@@ -29,9 +29,9 @@ float falloff(float value, float falloff)
 }
  
           
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
+void main()
 {         
-    vec2 uv = fragCoord.xy; 
+    vec2 uv = gl_FragCoord.xy; 
     vec2 mouse = mousePos * resolution.xy;
     vec2 lastMouse = mouseDelta * resolution.xy;
 
@@ -53,8 +53,5 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
     values.xy = mix(values.xy, direction, influence);
 
-    fragColor.xyz = values;
+    gl_FragColor.xyz = values;
 }
-
-
-void main(void) { mainImage(gl_FragColor, gl_FragCoord.xy); }
