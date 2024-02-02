@@ -222,7 +222,7 @@ function GetFloatExtensions(gl)
     if (!floatTexSupport)
         return;
 
-    // WebGL 1
+    // Check for floating-point render texture support on WebGL 1
     if (OESFloat && !EXTFloat)
     {
         console.log('WebGl1 float texture');

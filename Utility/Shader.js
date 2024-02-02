@@ -66,8 +66,8 @@ export class Shader
         if (fragmentURL)
             fragmentSrc = await GetText(fragmentURL);
 
-        vertexSrc = await Preprocess(vertexSrc);
-        fragmentSrc = await Preprocess(fragmentSrc);
+        vertexSrc = await Preprocess(vertexSrc, vertexURL);
+        fragmentSrc = await Preprocess(fragmentSrc, fragmentURL);
 
         return new Shader(gl, vertexSrc, fragmentSrc, uniforms, attributes);
     }
@@ -223,38 +223,76 @@ async function GetText(url)
 {
     const request = new Request(url);
     const response = await fetch(request);
+    
+    if (!response.ok)
+    {
+        throw new Error("Could not fetch source file: " + url);
+    }
+
     const text = await response.text();
 
     return text;
 }
 
 
-// Handle all shader file includes
-async function Preprocess(shader)
+function GetParentFolder(url, levels)
 {
+    for (let i = 0; i < levels; i++)
+    {
+        url = url.substring(0, url.lastIndexOf( "/" ) + 1);
+    }
+
+    return url;
+}
+
+
+const maxIncludeDepth = 8;
+
+
+async function GetIncludeText(includeLine, sourceURL, depth)
+{
+    if (depth > maxIncludeDepth)
+        throw new Error("Maximum include depth reached in source file: " + sourceURL);
+
+    if (!includeLine.includes('#include'))
+        return includeLine + '\n';
+
+    let includePath = includeLine.substring(includeLine.indexOf("\"") + 1, includeLine.lastIndexOf("\""));
+
+    if (!includePath)
+        return includeLine + '\n';
+
+    let count = (includePath.match(/\.\.\//g) || []).length;
+    let parentURL = GetParentFolder(sourceURL, count);
+
+    let cleanPath = includePath.replace(/\.\.\//g,'');
+
+    let newPath = count == 0 ? includePath : parentURL + cleanPath;
+
+    console.log("Including " + includePath);
+
+    let includeFile = await GetText(newPath);
+
+    let result = await Preprocess(includeFile, newPath, depth + 1);
+
+    return '// INCLUDE ' + newPath + '\n' + result + '\n// END INCLUDE\n';
+}
+
+
+// Handle all shader file includes
+async function Preprocess(shader, shaderURL, depth)
+{
+    if (depth === undefined)
+        depth = 0;
+
     let result = "";
 
     let linesSplit = shader.split(/\r?\n/);
-
+    
     for (let i = 0; i < linesSplit.length; i++)
     {
-        let line = linesSplit[i];
-
-        if (line.includes('#include'))
-        {
-            let includePath = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
-
-            if (includePath && includePath != "")
-            {
-                console.log("Including " + includePath);
-
-                let includeFile = await GetText(includePath);
-
-                line = "// BEGIN PREPROCESSOR INCLUDE\n" + includeFile + "\n// END PREPROCESSOR INCLUDE";  
-            } 
-        }
-
-        result += line + "\n";
+        let line = await GetIncludeText(linesSplit[i], shaderURL, depth);
+        result += line;
     }
 
     return result;

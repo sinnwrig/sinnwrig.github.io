@@ -49,4 +49,5 @@ export class Mesh
     }
 }
 
+// A fullscreen quad
 export const fullscreenMesh = new Mesh([ -1, -1, 1, -1, 1, 1, -1, 1 ], [ 0, 1, 2, 0, 2, 3 ]);

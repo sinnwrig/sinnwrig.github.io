@@ -13,24 +13,23 @@ var gl = CONTEXT.AutoGetContext(canvas);
 
 
 const nearFilter = WebGLRenderingContext.NEAREST;
+const floatTex = WebGLRenderingContext.FLOAT;
 
 // Get buffers
-const particleBuffer = new RenderBuffer(1, 1, { minFilter: nearFilter, magFilter: nearFilter, type:WebGLRenderingContext.FLOAT });
-const mouseBuffer = new RenderBuffer(1, 1, { minFilter: nearFilter, magFilter: nearFilter, type:WebGLRenderingContext.FLOAT });
+const particleBuffer = new RenderBuffer(1, 1, { minFilter: nearFilter, magFilter: nearFilter, type:floatTex });
+const mouseBuffer = new RenderBuffer(1, 1, { minFilter: nearFilter, magFilter: nearFilter, type:floatTex });
 
 
 // Final image shader
-var imageShader = null;
 var imageUniforms = {
     sourceTexture: { value: null },
     resolution: { value: null },
     background: { value: null },
     color: { value: null }
 };
-Shader.LoadFromFile(gl, null, "/Shaders/Fragment.hlsl", imageUniforms).then((shader) => imageShader = shader);
+var imageShader = await Shader.LoadFromFile(gl, null, "/Shaders/Fragment.glsl", imageUniforms);
 
 
-var mouseShader = null;
 var mouseUniforms = {
     sourceTexture: { value: null },
     resolution: { value: null },
@@ -43,11 +42,10 @@ var mouseUniforms = {
     attractionFalloff: { value: 0.005 },
     fadeSpeed: { value: 0.5 }
 };
-Shader.LoadFromFile(gl, null, "/Shaders/FlowTexture.hlsl", mouseUniforms).then((shader) => mouseShader = shader);
+var mouseShader = await Shader.LoadFromFile(gl, null, "/Shaders/FlowTexture.glsl", mouseUniforms);
 
 
 // Particle buffer shader
-var particleShader = null;
 var particleUniforms = { 
     sourceTexture: { value: null },
     vectorTexture: { value: null },
@@ -62,7 +60,7 @@ var particleUniforms = {
     particleSize: { value: 0.5}, // Particle size - Larger size will make particles coagulate, smaller size causes particles to dissapear.
     particleSpeed: { value: 0.75 }, // Speed at which particles move. Larger values reduce performance as shader needs to sample further away to compensate for additional particle movement.
 };
-Shader.LoadFromFile(gl, null, "/Shaders/DrawParticle.hlsl", particleUniforms).then((shader) => particleShader = shader);
+var particleShader = await Shader.LoadFromFile(gl, null, "/Shaders/DrawParticle.glsl", particleUniforms);
 
 
 function RenderFrame(timestamp) 
@@ -89,7 +87,8 @@ function RenderFrame(timestamp)
 
 function FormatBytes(bytes, decimals = 2) 
 {
-    if (!bytes) return '0 Bytes';
+    if (!bytes) 
+        return '0 Bytes';
 
     const k = 1000;
     const dm = decimals < 0 ? 0 : decimals;
@@ -117,7 +116,7 @@ function OnResize(width, height)
 
 var modeToggle = document.getElementById('modeSwitch');
 
-function UpdateStyle(darkTheme)
+function UpdateStyle()
 {
     let style = getComputedStyle(document.body);
     let backgroundHex = style.getPropertyValue('--backgroundColor');
@@ -134,7 +133,7 @@ function UpdateStyle(darkTheme)
 modeToggle.addEventListener('change', (ev) => 
 {
     document.body.setAttribute("color-theme", ev.target.checked ? "dark" : "light");
-    UpdateStyle(ev.target.checked);
+    UpdateStyle();
 });
 
 // Is user theme dark mode?
@@ -142,7 +141,7 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
 {
     modeToggle.checked = true;
     document.body.setAttribute("color-theme", "dark");
-    UpdateStyle(true);
+    UpdateStyle();
 }
 
 // User theme switch callback
@@ -150,7 +149,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (ev
 {
     modeToggle.checked = ev.matches;
     document.body.setAttribute("color-theme", ev.matches ? "dark" : "light");
-    UpdateStyle(ev.matches);
+    UpdateStyle();
 });
 
 

@@ -20,10 +20,9 @@ uniform float particleSpeed;
 
 #define MAX_ITERATIONS 10
 
-#include "/Shaders/Include/Hash.hlsl"
-#include "/Shaders/Include/Noise.hlsl"
+#include "../Include/Noise.glsl"
 
-#define NORMALIZE_VALUE
+#define PACK_POSITION
 
 
 #define UNROLLABLE_LOOP(minR, maxR, iter, val) for (int iter = 0; iter < MAX_ITERATIONS; iter++) { if (iter > int(abs(float(minR - maxR))) + 1) break; val = (iter - int(abs(float(minR - maxR)))) + 1;
@@ -72,8 +71,8 @@ vec2 sampleParticle(vec2 fragCoord)
             // Sample particle buffer
             vec2 fragment = texture2D(sourceTexture, uv).xy;
         
-        #ifdef NORMALIZE_VALUE
-            // Unpack normalized values
+        #ifdef PACK_POSITION
+            // Unpack particle position
             fragment = fragment * resolution.xy;
         #endif
 
@@ -108,8 +107,8 @@ void main()
 
     gl_FragColor.xyz = vec3(particle, fade);
 
-#ifdef NORMALIZE_VALUE
-    // Normalize particle position
+#ifdef PACK_POSITION
+    // Bring particle position to 0-1 range
     gl_FragColor.xy = gl_FragColor.xy / resolution.xy;
 #endif
 

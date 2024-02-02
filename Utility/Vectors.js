@@ -1,4 +1,4 @@
-// Vector package data types
+// Simple vector data types
 
 export class Vector2
 {

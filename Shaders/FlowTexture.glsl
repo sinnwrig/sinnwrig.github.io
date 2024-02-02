@@ -3,7 +3,6 @@ precision mediump float;
 uniform sampler2D sourceTexture;
 uniform vec3 resolution;
 uniform float deltaTime;
-uniform float frame;
 uniform vec2 mousePos;
 uniform vec2 mouseDelta;
 
