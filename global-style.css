@@ -1,15 +1,19 @@
 :root 
 {
-    --backgroundColor: #e6e6e6;
-    --text: #1a1a1a;
+    --backgroundColor: #e2e2e2;
+    --midgroundColor: #6b6b6b;
+    --color: #211f1f;
+
     --pad: 25px;
+    --transition: 1s;
 }
   
 
 [color-theme='dark'] 
 {
-    --backgroundColor: #0d0d0d;
-    --text: #f2f2f2;
+    --backgroundColor: #171616;
+    --midgroundColor: #a8a8a8;
+    --color: #d3cece;
 }
 
   
@@ -18,5 +22,14 @@ body
     margin: 0;
     font-family: 'Roboto', sans-serif;
     background-color: var(--backgroundColor);
-    color: var(--text);
+    color: var(--color);
+    transition:all ease-in-out var(--transition);
+}
+
+
+.box
+{
+    background-color: var(--backgroundColor);
+    color: var(-color);
+    transition:all ease-in-out var(--transition);
 }

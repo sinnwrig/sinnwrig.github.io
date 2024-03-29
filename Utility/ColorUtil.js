@@ -1,4 +1,4 @@
-import { Vector3 } from "./Vectors.js";
+import { Vector3, Vector4 } from "./Vectors.js";
 
 // Colorspace conversion utilities
 
@@ -65,7 +65,7 @@ export function RgbToHsl(rgb)
 
 export function HexToRgb(hex) 
 {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
     if (result)
     {
@@ -79,4 +79,26 @@ export function HexToRgb(hex)
     }
 
     return null;
+}
+
+
+var tempContext = undefined;
+
+export function CSSToRGBA(value) 
+{
+    if (tempContext === undefined)
+    {
+        let tempCanvas = document.createElement('canvas');
+        tempCanvas.height = 1;
+        tempCanvas.width = 1;
+
+        tempContext = tempCanvas.getContext('2d');
+    }
+    
+    tempContext.fillStyle = value;
+    tempContext.fillRect(0, 0, 1, 1);
+
+    let imageData = tempContext.getImageData(0, 0, 1, 1).data;
+
+    return new Vector4(imageData[0] / 255, imageData[1] / 255, imageData[2] / 255, imageData[3] / 255);
 }

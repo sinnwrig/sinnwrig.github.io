@@ -24,7 +24,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: gray;
+    background-color: var(--midgroundColor);
     -webkit-transition: .4s;
     transition: .4s;
 }
@@ -37,7 +37,7 @@
     width: 26px;
     left: 4px;
     bottom: 4px;
-    background-color: var(--text);
+    background-color: var(--color);
     -webkit-transition: .4s;
     transition: .4s;
 }

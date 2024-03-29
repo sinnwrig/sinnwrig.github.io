@@ -1,5 +1,5 @@
 import * as BLIT from "../Utility/Blit.js";
-import { Vector4 } from "../Utility/Vectors.js";
+import { Vector2, Vector3, Vector4 } from "../Utility/Vectors.js";
 import * as DEFAULTS from "../Utility/Defaults.js";
 import { Shader } from "../Utility/Shader.js";
 import * as CONTEXT from '../Utility/Context.js'
@@ -24,7 +24,6 @@ const mouseBuffer = new RenderBuffer(1, 1, { minFilter: nearFilter, magFilter: n
 var imageUniforms = {
     sourceTexture: { value: null },
     resolution: { value: null },
-    background: { value: null },
     color: { value: null }
 };
 var imageShader = await Shader.LoadFromFile(gl, null, "/Shaders/Fragment.glsl", imageUniforms);
@@ -53,12 +52,13 @@ var particleUniforms = {
     deltaTime: { value: null },
     frame: { value: null },
 
-    distribution: { value: 0.00003 }, // Particle distribution
-    density: { value: 0.003 }, // Global particle density
-    fadeSpeed: { value: 2.0 }, // units/s at which trails fade
+    distribution: { value: 0 }, // Particle distribution
+    density: { value: 0.000001 }, // Global particle density
+    fadeSpeed: { value: 1.5 }, // units/s at which trails fade
     noiseScale: { value: 2.0 }, // Noise sample scale
     particleSize: { value: 0.5}, // Particle size - Larger size will make particles coagulate, smaller size causes particles to dissapear.
-    particleSpeed: { value: 0.75 }, // Speed at which particles move. Larger values reduce performance as shader needs to sample further away to compensate for additional particle movement.
+    particleSpeed: { value: 0.5 }, // Speed at which particles move. Larger values reduce performance as shader needs to sample further away to compensate for additional particle movement.
+    directionParams: { value: new Vector3(0, -1, 0.05) } // x/y is default particle directon. z is blend between default and noise.
 };
 var particleShader = await Shader.LoadFromFile(gl, null, "/Shaders/DrawParticle.glsl", particleUniforms);
 
@@ -66,6 +66,8 @@ var particleShader = await Shader.LoadFromFile(gl, null, "/Shaders/DrawParticle.
 function RenderFrame(timestamp) 
 {
     requestAnimationFrame(RenderFrame);
+
+    UpdateStyle();
 
     if (!imageShader || !particleShader)
         return;
@@ -119,13 +121,10 @@ var modeToggle = document.getElementById('modeSwitch');
 function UpdateStyle()
 {
     let style = getComputedStyle(document.body);
-    let backgroundHex = style.getPropertyValue('--backgroundColor');
-    let textHex = style.getPropertyValue('--text');
+    let textHex = style.getPropertyValue('--midgroundColor');
 
-    let backCol = COLOR.HexToRgb(backgroundHex);
-    let textCol = COLOR.HexToRgb(textHex);
-    
-    imageUniforms.background.value = backCol;
+    let textCol = COLOR.CSSToRGBA(textHex);
+
     imageUniforms.color.value = textCol;
 }
 
@@ -133,7 +132,6 @@ function UpdateStyle()
 modeToggle.addEventListener('change', (ev) => 
 {
     document.body.setAttribute("color-theme", ev.target.checked ? "dark" : "light");
-    UpdateStyle();
 });
 
 // Is user theme dark mode?
@@ -141,7 +139,6 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
 {
     modeToggle.checked = true;
     document.body.setAttribute("color-theme", "dark");
-    UpdateStyle();
 }
 
 // User theme switch callback
@@ -149,13 +146,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (ev
 {
     modeToggle.checked = ev.matches;
     document.body.setAttribute("color-theme", ev.matches ? "dark" : "light");
-    UpdateStyle();
 });
-
 
 
 DEFAULTS.resizeCallbacks.Add(OnResize);
 DEFAULTS.Setup(canvas);
 
-UpdateStyle();
 RenderFrame();

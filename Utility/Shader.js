@@ -275,7 +275,7 @@ async function GetIncludeText(includeLine, sourceURL, depth)
 
     let result = await Preprocess(includeFile, newPath, depth + 1);
 
-    return '// INCLUDE ' + newPath + '\n' + result + '\n// END INCLUDE\n';
+    return '/* BEGIN INCLUDE ' + newPath + ' */ \n' + result + '\n/* END INCLUDE */\n';
 }
 
 

@@ -18,6 +18,8 @@ uniform float noiseScale;
 uniform float particleSize;
 uniform float particleSpeed;
 
+uniform vec3 directionParams;
+
 #define MAX_ITERATIONS 10
 
 #include "../Include/Noise.glsl"
@@ -32,7 +34,7 @@ uniform float particleSpeed;
 vec2 getFlow(vec2 position)
 {
     // Noise aspect is determined by screen height
-    vec2 noise = mix(vec2(0, -1), normalNoise(position / resolution.y, noiseScale, 354.459).xy, 0.3);
+    vec2 noise = mix(directionParams.xy, normalNoise(position / resolution.y, noiseScale, 354.459).xy, directionParams.z);
 
     vec3 vectorTex = texture2D(vectorTexture, position / resolution.xy).xyz;
 
