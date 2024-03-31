@@ -78,10 +78,10 @@ export function OnResize()
 {
     let pixelRatio = window.devicePixelRatio || 1;
 
-    var positionInfo = canvas.getBoundingClientRect();
+    let positionInfo = canvas.getBoundingClientRect();
 
-    var width = positionInfo.width * pixelRatio;
-    var height = positionInfo.height * pixelRatio;
+    let width = positionInfo.width * pixelRatio;
+    let height = positionInfo.height * pixelRatio;
 
     resolution = new Vector3(width, height, width / height);
 

@@ -18,6 +18,8 @@ export class Shader
 {
     constructor(gl, vertexSrc, fragmentSrc, uniforms, attributes) 
     {
+        console.log(fragmentSrc);
+
         if (!vertexSrc)
             vertexSrc = defaultVertex;
 

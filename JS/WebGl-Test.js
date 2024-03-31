@@ -39,7 +39,7 @@ var mouseUniforms = {
 
     dragFalloff: { value: 0.15 },
     attractionFalloff: { value: 0.005 },
-    fadeSpeed: { value: 0.5 }
+    fadeSpeed: { value: 0.25 }
 };
 var mouseShader = await Shader.LoadFromFile(gl, null, "/Shaders/FlowTexture.glsl", mouseUniforms);
 
@@ -58,7 +58,10 @@ var particleUniforms = {
     noiseScale: { value: 2.0 }, // Noise sample scale
     particleSize: { value: 0.5}, // Particle size - Larger size will make particles coagulate, smaller size causes particles to dissapear.
     particleSpeed: { value: 0.5 }, // Speed at which particles move. Larger values reduce performance as shader needs to sample further away to compensate for additional particle movement.
-    directionParams: { value: new Vector3(0, -1, 0.05) } // x/y is default particle directon. z is blend between default and noise.
+    directionParams: { value: new Vector3(0, -1, 0.05) }, // x/y is default particle directon. z is blend between default and noise.
+
+    boxFade: { value: 15 },
+    boxRect: { value: new Vector4(DEFAULTS.resolution.x * 0.25, DEFAULTS.resolution.y * 0.25, DEFAULTS.resolution.x * 0.5, DEFAULTS.resolution.y * 0.5) }
 };
 var particleShader = await Shader.LoadFromFile(gl, null, "/Shaders/DrawParticle.glsl", particleUniforms);
 
@@ -79,6 +82,7 @@ function RenderFrame(timestamp)
     mouseBuffer.Render(gl, mouseShader);
 
     particleUniforms.vectorTexture.value = mouseBuffer.RenderTexture();
+    particleUniforms.boxRect.value = new Vector4(DEFAULTS.resolution.x * 0.25, DEFAULTS.resolution.y * 0.25, DEFAULTS.resolution.x * 0.5, DEFAULTS.resolution.y * 0.5);
     particleBuffer.Render(gl, particleShader);
 
     // Render output

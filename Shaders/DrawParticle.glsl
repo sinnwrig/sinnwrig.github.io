@@ -20,6 +20,11 @@ uniform float particleSpeed;
 
 uniform vec3 directionParams;
 
+
+uniform float boxFade;
+uniform vec4 boxRect;
+
+
 #define MAX_ITERATIONS 10
 
 #include "../Include/Noise.glsl"
@@ -31,6 +36,68 @@ uniform vec3 directionParams;
 #define END_LOOP }
 
 
+vec2 projectVector(vec2 v, vec2 u) 
+{
+    float dotProduct = dot(v, u);
+    float uLengthSq = dot(u, u);
+    vec2 projectedVec = (dotProduct / uLengthSq) * u;
+    return projectedVec;
+}
+
+
+float inverseLerp(float a, float b, float x) {
+    return clamp((x - a) / (b - a), 0.0, 1.0);
+}
+
+
+vec2 projectCollision(vec2 velocity, vec2 line, float edge0, float edge1, float dist, bool isX)
+{
+    float step = inverseLerp(edge0, edge1, dist);
+
+    if (isX)
+        line.x *= sign(velocity.x);
+    else
+        line.y *= sign(velocity.y);
+
+    return normalize(mix(velocity, line, 0.5));
+}
+
+
+bool smallest(float value, float v2, float v3, float v4)
+{
+    return value < v2 && value < v3 && value < v4;
+}
+
+
+vec2 getPush(vec2 position, vec2 velocity)
+{
+    float leftDist = boxRect.x - position.x; // Distance from left of box
+    float rightDist = position.x - (boxRect.x + boxRect.z); // Distance from right of box
+    float downDist = boxRect.y - position.y; // Distance from top of box
+    float upDist = position.y - (boxRect.y + boxRect.w); // Distance from bottom of box
+
+    if (leftDist < 0.0 && rightDist < 0.0 && upDist < 0.0 && downDist < 0.0)
+        return vec2(0, 0);
+
+    if (leftDist > boxFade || rightDist > boxFade || upDist > boxFade || downDist > boxFade)
+        return velocity;
+
+    if (smallest(leftDist, rightDist, upDist, downDist))
+        velocity = projectCollision(velocity, vec2(0, 1), boxFade, .0, leftDist, false);
+
+    else if (smallest(rightDist, leftDist, upDist, downDist))
+        velocity = projectCollision(velocity, vec2(0, 1), boxFade, .0, rightDist, false);
+
+    else if (smallest(upDist, leftDist, rightDist, downDist))
+        velocity = projectCollision(velocity, vec2(1, 0), boxFade, .0, upDist, true);
+        
+    else if (smallest(downDist, leftDist, rightDist, upDist))
+        velocity = projectCollision(velocity, vec2(1, 0), boxFade, .0, downDist, true);
+    
+    return velocity;
+}
+
+
 vec2 getFlow(vec2 position)
 {
     // Noise aspect is determined by screen height
@@ -38,9 +105,11 @@ vec2 getFlow(vec2 position)
 
     vec3 vectorTex = texture2D(vectorTexture, position / resolution.xy).xyz;
 
-    vec2 direction = mix(noise, vectorTex.xy, vectorTex.z);
+    vec2 direction = normalize(mix(noise, vectorTex.xy, vectorTex.z));
 
-    return normalize(direction);
+    //vec2 push = getPush(position, direction);
+
+    return direction;//push;
 }
 
 float rand(vec2 p)
@@ -79,7 +148,7 @@ vec2 sampleParticle(vec2 fragCoord)
         #endif
 
             // Is the particle uninitialized?
-            if (fragment == vec2(0))
+            if (fragment == vec2(0.0))
             {
                 // Probability of initializing
                 if (rand(uv) > distribution) continue; // Don't initialize particle- skip iteration
